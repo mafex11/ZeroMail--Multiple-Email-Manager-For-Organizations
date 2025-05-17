@@ -6,10 +6,13 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"IBM Plex Sans"', 'sans-serif'],
+      },
       colors: {
-        'gmail-blue': '#1a73e8',
-        'gmail-hover': '#1557b0',
-        'gmail-gray': '#5f6368',
+        'gmail-blue': '#0B57D0',
+        'gmail-hover': '#F2F2F2',
+        'gmail-gray': '#5F6368',
         'gmail-light': '#f8f9fa',
       },
     },

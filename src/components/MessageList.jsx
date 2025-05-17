@@ -109,7 +109,7 @@ function MessageList({
             onClick={() => handleSort('sender')}
             className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
               sortBy === 'sender' 
-                ? 'bg-gmail-blue text-white' 
+                ? 'bg-gmail-blue text-white font-medium' 
                 : !isDarkMode
                   ? 'hover:bg-gmail-blue/10'
                   : 'hover:bg-gray-700'
@@ -124,7 +124,7 @@ function MessageList({
             onClick={() => handleSort('date')}
             className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
               sortBy === 'date' 
-                ? 'bg-gmail-blue text-white' 
+                ? 'bg-gmail-blue text-white font-medium' 
                 : !isDarkMode
                   ? 'hover:bg-gmail-blue/10'
                   : 'hover:bg-gray-700'
@@ -139,7 +139,7 @@ function MessageList({
         <select
           value={selectedAccount}
           onChange={(e) => onAccountChange(e.target.value)}
-          className={`bg-transparent border rounded-lg px-2 py-1.5 text-sm ${
+          className={`bg-transparent border rounded-lg px-2 py-1.5 text-sm font-medium ${
             isDarkMode 
               ? 'border-gray-700 text-gray-300 hover:border-gray-500 focus:border-gray-500 bg-gray-800'
               : 'border-gmail-gray/20 text-gmail-gray hover:border-gmail-blue focus:border-gmail-blue'
@@ -182,8 +182,8 @@ function MessageList({
                       <div className={`text-sm flex-1 ${
                         message.isUnread 
                           ? !isDarkMode
-                            ? 'font-bold text-gray-900'
-                            : 'font-bold text-white'
+                            ? 'font-semibold text-gray-900'
+                            : 'font-semibold text-white'
                           : !isDarkMode
                             ? 'font-medium text-gray-700'
                             : 'font-medium text-gray-300'
@@ -219,8 +219,8 @@ function MessageList({
                           ? 'font-semibold text-gray-800'
                           : 'font-semibold text-gray-200'
                         : !isDarkMode
-                          ? 'text-gray-600'
-                          : 'text-gray-400'
+                          ? 'font-medium text-gray-600'
+                          : 'font-medium text-gray-400'
                     }`}>
                       {message.subject}
                     </div>
@@ -230,7 +230,7 @@ function MessageList({
                       {message.snippet}
                     </div>
                   </div>
-                  <div className={`text-xs text-right flex flex-col items-end ${
+                  <div className={`text-xs text-right flex flex-col items-end font-medium ${
                     !isDarkMode ? 'text-gmail-gray' : 'text-gray-500'
                   }`}>
                     <div>{date}</div>
@@ -252,7 +252,7 @@ function MessageList({
             )
           })
         ) : (
-          <div className={`text-center py-4 ${
+          <div className={`text-center py-4 font-medium ${
             !isDarkMode ? 'text-gmail-gray' : 'text-gray-400'
           }`}>
             No messages to display in {messageFilter.toLowerCase()}

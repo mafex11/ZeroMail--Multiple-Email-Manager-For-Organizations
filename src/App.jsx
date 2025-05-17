@@ -36,10 +36,11 @@ function App() {
         if (import.meta.env.DEV) {
           const mockInbox = mockMessages.filter(msg => !msg.isSent)
           const mockSent = mockMessages.filter(msg => msg.isSent)
+          const mockAll = mockMessages
           setMessages({
             inbox: mockInbox,
             sent: mockSent,
-            all: mockMessages
+            all: mockAll
           })
           setAccounts([
             { 
@@ -77,7 +78,9 @@ function App() {
         if (savedAccounts.length > 0) {
           setRefreshing(true)
           try {
+            // Load all mail types in parallel
             await Promise.all([
+              loadMessages(savedAccounts, 'all'),
               loadMessages(savedAccounts, 'inbox'),
               loadMessages(savedAccounts, 'sent')
             ])
@@ -100,9 +103,10 @@ function App() {
       setRefreshing(true)
       setError(null)
       console.log('Starting message refresh...')
+      // Refresh all mail types in parallel
       await Promise.all([
-        loadMessages(accounts, 'inbox'),
-        loadMessages(accounts, 'sent')
+        loadMessages(accounts, messageFilter),
+        messageFilter === 'all' ? loadMessages(accounts, 'all') : Promise.resolve()
       ])
       console.log('Messages refreshed successfully')
     } catch (error) {
@@ -138,11 +142,25 @@ function App() {
           }
 
           // Construct query based on type
-          let query = type === 'sent' ? 'in:sent' : 'in:inbox'
+          let query = ''
+          switch (type) {
+            case 'inbox':
+              query = 'label:inbox -in:spam -in:trash'
+              break
+            case 'sent':
+              query = 'in:sent -in:spam -in:trash'
+              break
+            case 'all':
+              // Fetch all mail except spam, trash, and drafts
+              query = '-in:spam -in:trash -in:drafts'
+              break
+            default:
+              query = 'label:inbox -in:spam -in:trash'
+          }
 
           // Fetch message list and details in parallel for each account
           const messagesPromise = fetch(
-            `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=20&q=${encodeURIComponent(query)}`,
+            `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=50&q=${encodeURIComponent(query)}`,
             {
               headers: {
                 Authorization: `Bearer ${account.accessToken}`,
@@ -178,8 +196,11 @@ function App() {
                 const subject = headers.find((h) => h.name === 'Subject')?.value || '(No Subject)'
                 const from = headers.find((h) => h.name === 'From')?.value || 'Unknown'
                 const date = headers.find((h) => h.name === 'Date')?.value || new Date().toISOString()
-                const isUnread = messageData.labelIds?.includes('UNREAD') || false
-                const isSent = type === 'sent'
+                const labels = messageData.labelIds || []
+                const isUnread = labels.includes('UNREAD')
+                const isSent = labels.includes('SENT')
+                const isInbox = labels.includes('INBOX')
+                const messageType = type // Store the original query type
 
                 return {
                   id: message.id,
@@ -189,7 +210,10 @@ function App() {
                   snippet: messageData.snippet || '',
                   accountEmail: account.email,
                   isUnread,
-                  isSent
+                  isSent,
+                  isInbox,
+                  labels,
+                  messageType
                 }
               }).catch(error => {
                 console.error(`Error processing message:`, error)
@@ -236,10 +260,6 @@ function App() {
           ...prev,
           [type]: sortedMessages
         }
-        // Combine and sort all messages
-        newMessages.all = [...newMessages.inbox, ...newMessages.sent]
-          .sort((a, b) => new Date(b.date) - new Date(a.date))
-          .slice(0, 40) // Limit total messages
         return newMessages
       })
 
@@ -375,8 +395,11 @@ function App() {
       // Load initial messages
       console.log('Loading initial messages...')
       try {
-        await loadMessages([newAccount], 'inbox')
-        await loadMessages([newAccount], 'sent')
+        await Promise.all([
+          loadMessages([newAccount], 'all'),
+          loadMessages([newAccount], 'inbox'),
+          loadMessages([newAccount], 'sent')
+        ])
         console.log('Initial messages loaded successfully')
       } catch (messageError) {
         console.error('Failed to load initial messages:', messageError)
@@ -399,8 +422,11 @@ function App() {
       
       await chrome.storage.local.set({ accounts: updatedAccounts })
       setAccounts(updatedAccounts)
-      await loadMessages(updatedAccounts, 'inbox')
-      await loadMessages(updatedAccounts, 'sent')
+      await Promise.all([
+        loadMessages(updatedAccounts, 'all'),
+        loadMessages(updatedAccounts, 'inbox'),
+        loadMessages(updatedAccounts, 'sent')
+      ])
     } catch (error) {
       console.error('Error removing account:', error)
     }
@@ -570,6 +596,51 @@ function App() {
     }
   }
 
+  const sortedMessages = () => {
+    let filtered = [];
+    
+    // Select message list based on filter
+    switch (messageFilter) {
+      case 'inbox':
+        filtered = [...messages.inbox];
+        break;
+      case 'sent':
+        filtered = [...messages.sent];
+        break;
+      case 'all':
+      case 'recent':
+        // For 'all' and 'recent', use the dedicated all mail list
+        filtered = [...messages.all];
+        break;
+      case 'unread':
+        // For unread, filter from all messages
+        filtered = messages.all.filter(msg => msg.isUnread);
+        break;
+      default:
+        filtered = [...messages.all];
+    }
+    
+    // Filter by selected account
+    if (selectedAccount !== 'all') {
+      filtered = filtered.filter(msg => msg.accountEmail === selectedAccount);
+    }
+
+    // Sort messages
+    if (sortBy === 'recent' || messageFilter === 'recent') {
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    } else if (sortBy === 'unread' || messageFilter === 'unread') {
+      filtered.sort((a, b) => {
+        // Sort unread first, then by date
+        if (a.isUnread !== b.isUnread) {
+          return b.isUnread ? 1 : -1;
+        }
+        return new Date(b.date) - new Date(a.date);
+      });
+    }
+
+    return filtered;
+  };
+
   const FilterButton = ({ type, icon: Icon, label }) => (
     <button
       onClick={() => {
@@ -600,51 +671,6 @@ function App() {
     </button>
   )
 
-  const sortedMessages = () => {
-    let filtered = [];
-    
-    // Select message list based on filter
-    switch (messageFilter) {
-      case 'inbox':
-        filtered = messages.inbox;
-        break;
-      case 'sent':
-        filtered = messages.sent;
-        break;
-      case 'all':
-      case 'recent':
-        filtered = messages.all;
-        break;
-      case 'unread':
-        filtered = messages.all.filter(msg => msg.isUnread);
-        break;
-      default:
-        filtered = messages.all;
-    }
-    
-    // Filter by selected account
-    if (selectedAccount !== 'all') {
-      filtered = filtered.filter(msg => msg.accountEmail === selectedAccount);
-    }
-
-    // Sort messages
-    filtered = filtered.sort((a, b) => {
-      if (sortBy === 'recent' || messageFilter === 'recent') {
-        return new Date(b.date) - new Date(a.date);
-      }
-      if (sortBy === 'unread' || messageFilter === 'unread') {
-        // Sort unread first, then by date
-        if (a.isUnread !== b.isUnread) {
-          return b.isUnread ? 1 : -1;
-        }
-        return new Date(b.date) - new Date(a.date);
-      }
-      return 0;
-    });
-
-    return filtered;
-  };
-
   const toggleDarkMode = async () => {
     const newDarkMode = !isDarkMode
     setIsDarkMode(newDarkMode)
@@ -666,7 +692,7 @@ function App() {
       <div className={`flex items-center justify-between p-4 border-b ${
         isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gmail-blue/10'
       } sticky top-0 z-10`}>
-        <div className={`font-bold text-2xl tracking-tight select-none ${
+        <div className={`font-semibold text-2xl tracking-tight select-none ${
           isDarkMode ? 'text-white' : 'text-gmail-blue'
         }`}>
           Zero Mail
@@ -731,10 +757,10 @@ function App() {
           <div className={`p-4 ${isDarkMode ? 'text-gray-300' : ''}`}>
             {error && (
               <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center justify-between">
-                <span>{error}</span>
+                <span className="font-medium">{error}</span>
                 <button 
                   onClick={() => setError(null)} 
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 font-medium"
                 >
                   Dismiss
                 </button>
@@ -761,10 +787,10 @@ function App() {
                 <div className={`flex flex-col items-center justify-center h-[400px] ${
                   isDarkMode ? 'text-gray-400' : 'text-gmail-gray'
                 }`}>
-                  <p className="mb-2">No accounts connected</p>
+                  <p className="mb-2 font-medium">No accounts connected</p>
                   <button
                     onClick={handleAddAccount}
-                    className={`${
+                    className={`font-medium ${
                       isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-gmail-blue hover:text-gmail-hover'
                     }`}
                   >
@@ -775,7 +801,7 @@ function App() {
                 <div className={`flex items-center justify-center h-[400px] ${
                   isDarkMode ? 'text-gray-400' : 'text-gmail-gray'
                 }`}>
-                  No messages to display
+                  <span className="font-medium">No messages to display</span>
                 </div>
               ) : (
                 <MessageList 
