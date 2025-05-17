@@ -1,7 +1,25 @@
 import { useState } from 'react'
-import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
+import { 
+  ChevronUpIcon, 
+  ChevronDownIcon,
+  ArchiveBoxIcon,
+  EnvelopeIcon,
+  EnvelopeOpenIcon,
+  StarIcon
+} from '@heroicons/react/24/outline'
+import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid'
 
-function MessageList({ messages, accounts }) {
+function MessageList({ 
+  messages, 
+  accounts, 
+  isDarkMode = true, 
+  onArchive, 
+  onToggleRead, 
+  onToggleStar,
+  messageFilter = 'all',
+  selectedAccount = 'all',
+  onAccountChange
+}) {
   const [sortBy, setSortBy] = useState('date')
   const [sortOrder, setSortOrder] = useState('desc')
 
@@ -19,12 +37,6 @@ function MessageList({ messages, accounts }) {
           break
         case 'sender':
           comparison = a.from.localeCompare(b.from)
-          break
-        case 'subject':
-          comparison = a.subject.localeCompare(b.subject)
-          break
-        case 'account':
-          comparison = a.accountEmail.localeCompare(b.accountEmail)
           break
         default:
           comparison = 0
@@ -56,51 +68,94 @@ function MessageList({ messages, accounts }) {
     }
   }
 
+  const handleAction = (e, action, message) => {
+    e.stopPropagation() // Prevent message opening when clicking actions
+    switch (action) {
+      case 'archive':
+        onArchive?.(message)
+        break
+      case 'toggleRead':
+        onToggleRead?.(message)
+        break
+      case 'toggleStar':
+        onToggleStar?.(message)
+        break
+    }
+  }
+
+  const QuickActionButton = ({ icon: Icon, label, onClick, isActive }) => (
+    <button
+      onClick={onClick}
+      className={`p-1.5 rounded-full transition-colors ${
+        !isDarkMode
+          ? 'hover:bg-gray-200 text-gray-600 hover:text-gray-900'
+          : 'hover:bg-gray-700 text-gray-400 hover:text-white'
+      } ${isActive ? '!text-gmail-blue' : ''}`}
+      title={label}
+      aria-label={label}
+    >
+      <Icon className="w-5 h-5" />
+    </button>
+  )
+
   const sortedMessages = sortMessages(messages)
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3 text-sm text-gmail-gray">
-        <span className="font-medium">Sort by:</span>
-        <button
-          onClick={() => handleSort('sender')}
-          className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
-            sortBy === 'sender' 
-              ? 'bg-gmail-blue text-white' 
-              : 'hover:bg-gmail-blue/10'
-          }`}
+      <div className={`flex items-center justify-between gap-3 text-sm ${!isDarkMode ? 'text-gmail-gray' : 'text-gray-400'}`}>
+        <div className="flex items-center gap-3">
+          <span className="font-medium">Sort by:</span>
+          <button
+            onClick={() => handleSort('sender')}
+            className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
+              sortBy === 'sender' 
+                ? 'bg-gmail-blue text-white' 
+                : !isDarkMode
+                  ? 'hover:bg-gmail-blue/10'
+                  : 'hover:bg-gray-700'
+            }`}
+          >
+            Name
+            {sortBy === 'sender' && (
+              sortOrder === 'asc' ? <ChevronUpIcon className="h-4 w-4 ml-1" /> : <ChevronDownIcon className="h-4 w-4 ml-1" />
+            )}
+          </button>
+          <button
+            onClick={() => handleSort('date')}
+            className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
+              sortBy === 'date' 
+                ? 'bg-gmail-blue text-white' 
+                : !isDarkMode
+                  ? 'hover:bg-gmail-blue/10'
+                  : 'hover:bg-gray-700'
+            }`}
+          >
+            Date/Time
+            {sortBy === 'date' && (
+              sortOrder === 'asc' ? <ChevronUpIcon className="h-4 w-4 ml-1" /> : <ChevronDownIcon className="h-4 w-4 ml-1" />
+            )}
+          </button>
+        </div>
+        <select
+          value={selectedAccount}
+          onChange={(e) => onAccountChange(e.target.value)}
+          className={`bg-transparent border rounded-lg px-2 py-1.5 text-sm ${
+            isDarkMode 
+              ? 'border-gray-700 text-gray-300 hover:border-gray-500 focus:border-gray-500 bg-gray-800'
+              : 'border-gmail-gray/20 text-gmail-gray hover:border-gmail-blue focus:border-gmail-blue'
+          } focus:outline-none`}
         >
-          Name
-          {sortBy === 'sender' && (
-            sortOrder === 'asc' ? <ChevronUpIcon className="h-4 w-4 ml-1" /> : <ChevronDownIcon className="h-4 w-4 ml-1" />
-          )}
-        </button>
-        <button
-          onClick={() => handleSort('date')}
-          className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
-            sortBy === 'date' 
-              ? 'bg-gmail-blue text-white' 
-              : 'hover:bg-gmail-blue/10'
-          }`}
-        >
-          Date/Time
-          {sortBy === 'date' && (
-            sortOrder === 'asc' ? <ChevronUpIcon className="h-4 w-4 ml-1" /> : <ChevronDownIcon className="h-4 w-4 ml-1" />
-          )}
-        </button>
-        <button
-          onClick={() => handleSort('subject')}
-          className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
-            sortBy === 'subject' 
-              ? 'bg-gmail-blue text-white' 
-              : 'hover:bg-gmail-blue/10'
-          }`}
-        >
-          Subject
-          {sortBy === 'subject' && (
-            sortOrder === 'asc' ? <ChevronUpIcon className="h-4 w-4 ml-1" /> : <ChevronDownIcon className="h-4 w-4 ml-1" />
-          )}
-        </button>
+          <option value="all" className={isDarkMode ? 'bg-gray-800 text-gray-300' : ''}>All Accounts</option>
+          {accounts.map(account => (
+            <option 
+              key={account.email} 
+              value={account.email}
+              className={isDarkMode ? 'bg-gray-800 text-gray-300' : ''}
+            >
+              {account.email.split('@')[0]}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="space-y-2">
@@ -109,23 +164,75 @@ function MessageList({ messages, accounts }) {
             const { date, time } = formatDate(message.date)
             const senderName = extractSenderName(message.from)
             
+            const showArchive = messageFilter !== 'archive' && messageFilter !== 'sent'
+            
             return (
               <div
                 key={message.id}
-                className="p-3 hover:bg-gmail-hover rounded cursor-pointer"
+                className={`group p-3 rounded cursor-pointer ${
+                  !isDarkMode 
+                    ? 'hover:bg-gmail-hover' 
+                    : 'hover:bg-gray-800'
+                }`}
                 onClick={() => window.open(`https://mail.google.com/mail/u/${message.accountEmail}/#inbox/${message.id}`, '_blank')}
               >
                 <div className="flex justify-between items-start gap-4">
-                  <div className="flex-1">
-                    <div className={`text-sm ${message.isUnread ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}>
-                      {senderName}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <div className={`text-sm flex-1 ${
+                        message.isUnread 
+                          ? !isDarkMode
+                            ? 'font-bold text-gray-900'
+                            : 'font-bold text-white'
+                          : !isDarkMode
+                            ? 'font-medium text-gray-700'
+                            : 'font-medium text-gray-300'
+                      }`}>
+                        {senderName}
+                      </div>
+                      <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        {showArchive && (
+                          <QuickActionButton
+                            icon={ArchiveBoxIcon}
+                            label="Archive"
+                            onClick={(e) => handleAction(e, 'archive', message)}
+                          />
+                        )}
+                        {messageFilter !== 'sent' && (
+                          <QuickActionButton
+                            icon={message.isUnread ? EnvelopeOpenIcon : EnvelopeIcon}
+                            label={message.isUnread ? "Mark as read" : "Mark as unread"}
+                            onClick={(e) => handleAction(e, 'toggleRead', message)}
+                          />
+                        )}
+                        <QuickActionButton
+                          icon={message.isStarred ? StarIconSolid : StarIcon}
+                          label={message.isStarred ? "Unstar" : "Star"}
+                          onClick={(e) => handleAction(e, 'toggleStar', message)}
+                          isActive={message.isStarred}
+                        />
+                      </div>
                     </div>
-                    <div className={`text-sm mt-1 ${message.isUnread ? 'font-semibold text-gray-800' : 'text-gray-600'}`}>
+                    <div className={`text-sm mt-1 truncate ${
+                      message.isUnread
+                        ? !isDarkMode
+                          ? 'font-semibold text-gray-800'
+                          : 'font-semibold text-gray-200'
+                        : !isDarkMode
+                          ? 'text-gray-600'
+                          : 'text-gray-400'
+                    }`}>
                       {message.subject}
                     </div>
-                    <div className="text-xs text-gmail-gray line-clamp-1 mt-1">{message.snippet}</div>
+                    <div className={`text-xs line-clamp-1 mt-1 ${
+                      !isDarkMode ? 'text-gmail-gray' : 'text-gray-500'
+                    }`}>
+                      {message.snippet}
+                    </div>
                   </div>
-                  <div className="text-xs text-gmail-gray text-right flex flex-col items-end">
+                  <div className={`text-xs text-right flex flex-col items-end ${
+                    !isDarkMode ? 'text-gmail-gray' : 'text-gray-500'
+                  }`}>
                     <div>{date}</div>
                     <div>{time}</div>
                     <div className="mt-2">
@@ -145,22 +252,12 @@ function MessageList({ messages, accounts }) {
             )
           })
         ) : (
-          <div className="text-center text-gmail-gray py-4">
-            No messages to display
+          <div className={`text-center py-4 ${
+            !isDarkMode ? 'text-gmail-gray' : 'text-gray-400'
+          }`}>
+            No messages to display in {messageFilter.toLowerCase()}
           </div>
         )}
-      </div>
-      
-      <div className="flex justify-end mt-2">
-        <button
-          onClick={() => handleSort('account')}
-          className="flex items-center text-xs text-gmail-gray hover:text-gmail-blue"
-        >
-          Sort by Account
-          {sortBy === 'account' && (
-            sortOrder === 'asc' ? <ChevronUpIcon className="h-3 w-3 ml-1" /> : <ChevronDownIcon className="h-3 w-3 ml-1" />
-          )}
-        </button>
       </div>
     </div>
   )
