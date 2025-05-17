@@ -1,9 +1,14 @@
 import { useState } from 'react'
 import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 
-function MessageList({ messages }) {
+function MessageList({ messages, accounts }) {
   const [sortBy, setSortBy] = useState('date')
   const [sortOrder, setSortOrder] = useState('desc')
+
+  const getAccountProfilePicture = (accountEmail) => {
+    const account = accounts.find(acc => acc.email === accountEmail)
+    return account?.profilePicture || "https://www.gstatic.com/favicon.ico"
+  }
 
   const sortMessages = (messages) => {
     return [...messages].sort((a, b) => {
@@ -55,10 +60,15 @@ function MessageList({ messages }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between text-sm text-gmail-gray">
+      <div className="flex items-center gap-3 text-sm text-gmail-gray">
+        <span className="font-medium">Sort by:</span>
         <button
           onClick={() => handleSort('sender')}
-          className="flex items-center hover:text-gmail-blue"
+          className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
+            sortBy === 'sender' 
+              ? 'bg-gmail-blue text-white' 
+              : 'hover:bg-gmail-blue/10'
+          }`}
         >
           Name
           {sortBy === 'sender' && (
@@ -67,7 +77,11 @@ function MessageList({ messages }) {
         </button>
         <button
           onClick={() => handleSort('date')}
-          className="flex items-center hover:text-gmail-blue"
+          className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
+            sortBy === 'date' 
+              ? 'bg-gmail-blue text-white' 
+              : 'hover:bg-gmail-blue/10'
+          }`}
         >
           Date/Time
           {sortBy === 'date' && (
@@ -76,7 +90,11 @@ function MessageList({ messages }) {
         </button>
         <button
           onClick={() => handleSort('subject')}
-          className="flex items-center hover:text-gmail-blue"
+          className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
+            sortBy === 'subject' 
+              ? 'bg-gmail-blue text-white' 
+              : 'hover:bg-gmail-blue/10'
+          }`}
         >
           Subject
           {sortBy === 'subject' && (
@@ -97,21 +115,30 @@ function MessageList({ messages }) {
                 className="p-3 hover:bg-gmail-hover rounded cursor-pointer"
                 onClick={() => window.open(`https://mail.google.com/mail/u/${message.accountEmail}/#inbox/${message.id}`, '_blank')}
               >
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="text-sm font-medium truncate">{senderName}</div>
-                  <div className="text-xs text-gmail-gray text-right">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <div className={`text-sm ${message.isUnread ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}>
+                      {senderName}
+                    </div>
+                    <div className={`text-sm mt-1 ${message.isUnread ? 'font-semibold text-gray-800' : 'text-gray-600'}`}>
+                      {message.subject}
+                    </div>
+                    <div className="text-xs text-gmail-gray line-clamp-1 mt-1">{message.snippet}</div>
+                  </div>
+                  <div className="text-xs text-gmail-gray text-right flex flex-col items-end">
                     <div>{date}</div>
                     <div>{time}</div>
-                  </div>
-                  <div className="text-sm font-medium truncate">{message.subject}</div>
-                </div>
-                <div className="flex justify-between items-center mt-1">
-                  <div className="text-xs text-gmail-gray line-clamp-1">{message.snippet}</div>
-                  <div 
-                    className="text-xs bg-gmail-light rounded-full px-2 py-0.5 ml-2 flex-shrink-0" 
-                    title={`From account: ${message.accountEmail}`}
-                  >
-                    {message.accountEmail}
+                    <div className="mt-2">
+                      <img
+                        src={getAccountProfilePicture(message.accountEmail)}
+                        alt={`${message.accountEmail}'s profile`}
+                        className="w-6 h-6 rounded-full"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "https://www.gstatic.com/favicon.ico";
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
