@@ -22,6 +22,7 @@ function MessageList({
 }) {
   const [sortBy, setSortBy] = useState('date')
   const [sortOrder, setSortOrder] = useState('desc')
+  const [showUnreadFirst, setShowUnreadFirst] = useState(false)
 
   const getAccountProfilePicture = (accountEmail) => {
     const account = accounts.find(acc => acc.email === accountEmail)
@@ -31,6 +32,15 @@ function MessageList({
   const sortMessages = (messages) => {
     return [...messages].sort((a, b) => {
       let comparison = 0
+      
+      // Always apply unread sorting first if enabled
+      if (showUnreadFirst) {
+        if (a.isUnread !== b.isUnread) {
+          return a.isUnread ? -1 : 1
+        }
+      }
+      
+      // Then apply the selected sort
       switch (sortBy) {
         case 'date':
           comparison = new Date(a.date) - new Date(b.date)
@@ -39,7 +49,7 @@ function MessageList({
           comparison = a.from.localeCompare(b.from)
           break
         default:
-          comparison = 0
+          comparison = new Date(a.date) - new Date(b.date)
       }
       return sortOrder === 'asc' ? comparison : -comparison
     })
@@ -130,22 +140,34 @@ function MessageList({
                   : 'hover:bg-gray-700'
             }`}
           >
-            Date/Time
+            Recent
             {sortBy === 'date' && (
               sortOrder === 'asc' ? <ChevronUpIcon className="h-4 w-4 ml-1" /> : <ChevronDownIcon className="h-4 w-4 ml-1" />
             )}
+          </button>
+          <button
+            onClick={() => setShowUnreadFirst(prev => !prev)}
+            className={`flex items-center justify-center px-3 py-1.5 rounded-full transition-colors w-[80px] ${
+              showUnreadFirst 
+                ? 'bg-gmail-blue text-white font-medium' 
+                : !isDarkMode
+                  ? 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+            }`}
+          >
+            {showUnreadFirst ? 'Read' : 'Unread'}
           </button>
         </div>
         <select
           value={selectedAccount}
           onChange={(e) => onAccountChange(e.target.value)}
-          className={`bg-transparent border rounded-lg px-2 py-1.5 text-sm font-medium ${
+          className={`bg-transparent border rounded-lg px-2 py-1.5 text-sm font-medium w-[100px] ${
             isDarkMode 
               ? 'border-gray-700 text-gray-300 hover:border-gray-500 focus:border-gray-500 bg-gray-800'
               : 'border-gmail-gray/20 text-gmail-gray hover:border-gmail-blue focus:border-gmail-blue'
           } focus:outline-none`}
         >
-          <option value="all" className={isDarkMode ? 'bg-gray-800 text-gray-300' : ''}>All Accounts</option>
+          <option value="all" className={isDarkMode ? 'bg-gray-800 text-gray-300' : ''}>All</option>
           {accounts.map(account => (
             <option 
               key={account.email} 
