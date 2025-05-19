@@ -1,10 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background-color: rgb(17, 24, 39);">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/src/assets/email-envelope-close--Streamline-Pixel.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zero Mail - Development</title>
+    <title>Fusion Mail</title>
+    <!-- Critical CSS to prevent flash -->
+    <style>
+      html, body, #root {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 600px;
+        background-color: rgb(17, 24, 39);
+      }
+    </style>
+    <link rel="preload" href="/src/assets/bg.png" as="image" type="image/png" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <script>
+      // Register service worker for asset caching
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful');
+            })
+            .catch(err => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap');
+
+/* Initial styles to prevent white flash */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 500px;
+  height: 600px;
+  background-color: rgb(17, 24, 39); /* Dark background by default */
+  overflow: hidden; /* Prevent any unwanted scrolling */
+  scroll-behavior: smooth; /* Enable smooth scrolling */
+}
+
+/* Enable smooth scrolling for all scrollable elements */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Force scrollbar to always show to prevent layout shift */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px; /* For consistency */
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* For Firefox - always show scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.4) rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure content area maintains height */
+.overflow-y-scroll {
+  scrollbar-gutter: stable;
+  min-height: calc(600px - 72px); /* Full height minus header */
+  scroll-behavior: smooth; /* Enable smooth scrolling for message list */
+}
+
+#root {
+  opacity: 0;
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.doto-title {
+  font-family: "Doto", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;  /* Changed from 700 to 300 for a thinner look */
+  font-style: normal;
+  font-variation-settings: "ROND" 0;
+  letter-spacing: -0.03em;
+} 

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Cog6ToothIcon, PlusIcon, EnvelopeIcon, ArrowPathIcon, SunIcon, MoonIcon, InboxIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline'
+import { Cog6ToothIcon, PlusIcon, EnvelopeIcon, ArrowPathIcon, SunIcon, MoonIcon, InboxIcon, PaperAirplaneIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import MessageList from './components/MessageList'
 import SettingsPage from './components/SettingsPage'
 import AvatarPage from './components/AvatarPage'
 import { mockMessages } from './mockData'
 import bgImage from './assets/bg.png'
+import logo from './assets/email-envelope-close--Streamline-Pixel.svg'
+import './styles.css'
 
 const clientId = '78669493829-j94lrbse4jre3slbe2ol613sbn288mqf.apps.googleusercontent.com'
 const redirectUri = 'https://nmgohjeebbjdpackknbamacpelkkbmcc.chromiumapp.org/'
@@ -19,13 +21,51 @@ const SCOPES = [
 function App() {
   const [accounts, setAccounts] = useState([])
   const [messages, setMessages] = useState({ inbox: [], sent: [], all: [] })
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [initializing, setInitializing] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState(null)
   const [currentPage, setCurrentPage] = useState('main')
   const [messageFilter, setMessageFilter] = useState('inbox')
   const [selectedAccount, setSelectedAccount] = useState('all')
   const [isDarkMode, setIsDarkMode] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [bgLoaded, setBgLoaded] = useState(false)
+
+  // Background refresh interval (15 seconds)
+  useEffect(() => {
+    // Don't set up interval if no accounts
+    if (accounts.length === 0) return;
+
+    const intervalId = setInterval(async () => {
+      if (!refreshing) { // Only refresh if not already refreshing
+        console.log('Starting background refresh...');
+        try {
+          setRefreshing(true);
+          await Promise.all([
+            loadMessages(accounts, 'all'),
+            loadMessages(accounts, 'inbox'),
+            loadMessages(accounts, 'sent')
+          ]);
+        } catch (error) {
+          console.error('Background refresh failed:', error);
+          // Don't show error to user for background refreshes
+        } finally {
+          setRefreshing(false);
+        }
+      }
+    }, 15000); // 15 seconds
+
+    // Cleanup interval on unmount or when accounts change
+    return () => clearInterval(intervalId);
+  }, [accounts, refreshing]); // Dependencies: accounts and refreshing state
+
+  // Preload background image
+  useEffect(() => {
+    const img = new Image()
+    img.src = bgImage
+    img.onload = () => setBgLoaded(true)
+  }, [])
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -54,8 +94,8 @@ function App() {
               profilePicture: 'https://lh3.googleusercontent.com/a/default-user=s32-c'
             }
           ])
-          // In dev mode, just use default dark mode
-          setIsDarkMode(true)
+          setLoading(false)
+          setInitializing(false)
           return
         }
 
@@ -68,14 +108,14 @@ function App() {
         setAccounts(savedAccounts)
         setIsDarkMode(storage.isDarkMode ?? true)
         setMessages(cachedMessages)
-
-        // If we have accounts but no cached messages, show loading state
-        if (savedAccounts.length > 0 && 
-            cachedMessages.inbox.length === 0 && 
-            cachedMessages.sent.length === 0 && 
-            cachedMessages.all.length === 0) {
-          setLoading(true)
+        
+        // If we have cached messages or no accounts, we can stop loading
+        if (cachedMessages.all.length > 0 || savedAccounts.length === 0) {
+          setLoading(false)
         }
+        
+        // Always set initializing to false after initial data load
+        setInitializing(false)
 
         // If we have accounts, refresh ALL message types for ALL accounts in background
         if (savedAccounts.length > 0) {
@@ -92,14 +132,13 @@ function App() {
             
             // Update cache with fresh data
             const freshMessages = {
-              inbox: results[1], // inbox was second in the array
-              sent: results[2],  // sent was third
-              all: results[0]    // all was first
+              inbox: results[1],
+              sent: results[2],
+              all: results[0]
             }
             
             // Set the fresh messages
             setMessages(freshMessages)
-            setLoading(false) // Ensure loading is false after refresh
             
             // Update cache
             await chrome.storage.local.set({
@@ -118,6 +157,7 @@ function App() {
         console.error('Error initializing app:', error)
         setError('Failed to initialize. Please try again.')
         setLoading(false)
+        setInitializing(false)
       }
     }
 
@@ -470,12 +510,38 @@ function App() {
         throw new Error('Failed to archive message')
       }
 
-      // Remove message from local state
-      setMessages(prev => ({
-        ...prev,
-        inbox: prev.inbox.filter(msg => msg.id !== message.id),
-        sent: prev.sent.filter(msg => msg.id !== message.id)
-      }))
+      // Update all message lists in state immediately
+      const updatedMessage = { 
+        ...message, 
+        isInbox: false, 
+        labels: message.labels.filter(l => l !== 'INBOX').concat(['ARCHIVE']) 
+      }
+
+      // Remove from current view if we're in inbox or all view
+      setMessages(prev => {
+        const newState = { ...prev }
+        
+        // Always remove from inbox
+        newState.inbox = prev.inbox.filter(msg => msg.id !== message.id)
+        
+        // Keep in sent if it was there
+        if (message.isSent) {
+          newState.sent = prev.sent.map(msg => 
+            msg.id === message.id ? updatedMessage : msg
+          )
+        } else {
+          newState.sent = prev.sent.filter(msg => msg.id !== message.id)
+        }
+        
+        // Update in all messages list but don't show in main views
+        newState.all = prev.all.map(msg => 
+          msg.id === message.id ? updatedMessage : msg
+        ).filter(msg => 
+          messageFilter === 'sent' ? msg.isSent : msg.isInbox || msg.isSent
+        )
+        
+        return newState
+      })
       
       // Update cache
       const storage = await chrome.storage.local.get('cachedMessages')
@@ -484,7 +550,12 @@ function App() {
         cachedMessages: {
           ...cachedMessages,
           inbox: cachedMessages.inbox.filter(msg => msg.id !== message.id),
-          sent: cachedMessages.sent.filter(msg => msg.id !== message.id)
+          sent: message.isSent 
+            ? cachedMessages.sent.map(msg => msg.id === message.id ? updatedMessage : msg)
+            : cachedMessages.sent.filter(msg => msg.id !== message.id),
+          all: cachedMessages.all.map(msg => 
+            msg.id === message.id ? updatedMessage : msg
+          )
         }
       })
     } catch (error) {
@@ -520,15 +591,14 @@ function App() {
         throw new Error('Failed to update message read status')
       }
 
-      // Update message in local state
+      // Update all message lists in state immediately
+      const updatedMessage = { ...message, isUnread: newIsUnread }
+
       setMessages(prev => ({
         ...prev,
-        inbox: prev.inbox.map(msg =>
-          msg.id === message.id ? { ...msg, isUnread: newIsUnread } : msg
-        ),
-        sent: prev.sent.map(msg =>
-          msg.id === message.id ? { ...msg, isUnread: newIsUnread } : msg
-        )
+        inbox: prev.inbox.map(msg => msg.id === message.id ? updatedMessage : msg),
+        sent: prev.sent.map(msg => msg.id === message.id ? updatedMessage : msg),
+        all: prev.all.map(msg => msg.id === message.id ? updatedMessage : msg)
       }))
       
       // Update cache
@@ -537,12 +607,9 @@ function App() {
       await chrome.storage.local.set({
         cachedMessages: {
           ...cachedMessages,
-          inbox: cachedMessages.inbox.map(msg =>
-            msg.id === message.id ? { ...msg, isUnread: newIsUnread } : msg
-          ),
-          sent: cachedMessages.sent.map(msg =>
-            msg.id === message.id ? { ...msg, isUnread: newIsUnread } : msg
-          )
+          inbox: cachedMessages.inbox.map(msg => msg.id === message.id ? updatedMessage : msg),
+          sent: cachedMessages.sent.map(msg => msg.id === message.id ? updatedMessage : msg),
+          all: cachedMessages.all.map(msg => msg.id === message.id ? updatedMessage : msg)
         }
       })
     } catch (error) {
@@ -578,15 +645,14 @@ function App() {
         throw new Error('Failed to update message star status')
       }
 
-      // Update message in local state
+      // Update all message lists in state immediately
+      const updatedMessage = { ...message, isStarred: newIsStarred }
+
       setMessages(prev => ({
         ...prev,
-        inbox: prev.inbox.map(msg =>
-          msg.id === message.id ? { ...msg, isStarred: newIsStarred } : msg
-        ),
-        sent: prev.sent.map(msg =>
-          msg.id === message.id ? { ...msg, isStarred: newIsStarred } : msg
-        )
+        inbox: prev.inbox.map(msg => msg.id === message.id ? updatedMessage : msg),
+        sent: prev.sent.map(msg => msg.id === message.id ? updatedMessage : msg),
+        all: prev.all.map(msg => msg.id === message.id ? updatedMessage : msg)
       }))
       
       // Update cache
@@ -595,12 +661,9 @@ function App() {
       await chrome.storage.local.set({
         cachedMessages: {
           ...cachedMessages,
-          inbox: cachedMessages.inbox.map(msg =>
-            msg.id === message.id ? { ...msg, isStarred: newIsStarred } : msg
-          ),
-          sent: cachedMessages.sent.map(msg =>
-            msg.id === message.id ? { ...msg, isStarred: newIsStarred } : msg
-          )
+          inbox: cachedMessages.inbox.map(msg => msg.id === message.id ? updatedMessage : msg),
+          sent: cachedMessages.sent.map(msg => msg.id === message.id ? updatedMessage : msg),
+          all: cachedMessages.all.map(msg => msg.id === message.id ? updatedMessage : msg)
         }
       })
     } catch (error) {
@@ -630,6 +693,16 @@ function App() {
     // Filter by selected account
     if (selectedAccount !== 'all') {
       filtered = filtered.filter(msg => msg.accountEmail === selectedAccount);
+    }
+
+    // Filter by search term
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim()
+      filtered = filtered.filter(msg => 
+        msg.subject.toLowerCase().includes(term) ||
+        msg.from.toLowerCase().includes(term) ||
+        msg.snippet.toLowerCase().includes(term)
+      )
     }
 
     // Sort messages by date (most recent first)
@@ -668,13 +741,13 @@ function App() {
     await chrome.storage.local.set({ isDarkMode: newDarkMode })
   }
 
-  if (loading) {
+  if (initializing) {
     return (
       <div className={`w-[500px] h-[600px] ${isDarkMode ? 'dark bg-gray-900' : 'bg-white'}`}>
         <div className="flex items-center justify-center h-full">
           <div className="flex flex-col items-center gap-3">
             <div className="animate-spin rounded-full h-10 w-10 border-4 border-gmail-blue border-t-transparent"></div>
-            <p className="text-sm text-white">Setting up your account...</p>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading...</p>
           </div>
         </div>
       </div>
@@ -682,19 +755,35 @@ function App() {
   }
 
   return (
-    <div className={`bg-bottom-left w-[500px] h-[600px] flex flex-col ${isDarkMode ? 'dark' : ''}`}
-         style={{
-           backgroundImage: `url(${bgImage})`,
-           backgroundSize: 'cover',
-           backgroundPosition: 'left'
-         }}>
+    <div 
+      className={`w-[500px] h-[600px] flex flex-col ${isDarkMode ? 'dark' : ''} transition-[background-image] duration-300`}
+      style={{
+        ...(bgLoaded && {
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'left'
+        }),
+        backgroundColor: isDarkMode ? 'rgb(17, 24, 39)' : 'rgb(243, 244, 246)'
+      }}
+    >
       <div className={`flex items-center justify-between p-4 border-b backdrop-blur-md ${
         isDarkMode ? 'bg-gray-800/30 border-gray-700' : 'bg-white/30 border-gray-200'
       } sticky top-0 z-10`}>
-        <div className={`font-semibold text-2xl tracking-tight select-none ${
-          isDarkMode ? 'text-white' : 'text-gmail-blue'
-        }`}>
-          Zero Mail
+        <div className="flex items-center gap-2">
+          <img 
+            src={logo} 
+            alt="Fusion Mail Logo" 
+            className={`w-8 h-8 transition-all ${
+              isDarkMode 
+                ? 'brightness-0 invert' // Makes the logo white in dark mode
+                : 'brightness-100 invert-0 text-gmail-blue' // Original color in light mode
+            }`}
+          />
+          <div className={`font-semibold text-2xl tracking-tight select-none doto-title ${
+            isDarkMode ? 'text-white' : 'text-gmail-blue'
+          }`}>
+            FUSION MAIL
+          </div>
         </div>
         <div className={`flex items-center gap-2`}>
           <button 
@@ -737,7 +826,7 @@ function App() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto backdrop-blur-md bg-black/5">
+      <div className="flex-1 overflow-y-scroll backdrop-blur-md bg-black/5">
         {currentPage === 'main' && (
           <div className={`p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
             {error && (
@@ -753,11 +842,27 @@ function App() {
             )}
             
             <div className="flex flex-col gap-4">
-              {/* Filter buttons */}
-              <div className="flex items-center gap-1.5 pb-2 border-b border-gray-200 dark:border-gray-700">
-                <FilterButton type="all" icon={EnvelopeIcon} label="All" />
-                <FilterButton type="inbox" icon={InboxIcon} label="Inbox" />
-                <FilterButton type="sent" icon={PaperAirplaneIcon} label="Sent" />
+              {/* Filter buttons and search */}
+              <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-1.5">
+                  <FilterButton type="all" icon={EnvelopeIcon} label="All" />
+                  <FilterButton type="inbox" icon={InboxIcon} label="Inbox" />
+                  <FilterButton type="sent" icon={PaperAirplaneIcon} label="Sent" />
+                </div>
+                <div className="relative flex items-center">
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search emails..."
+                    className={`pl-9 pr-3 py-1.5 rounded-full text-sm transition-colors w-[200px] focus:outline-none ${
+                      isDarkMode
+                        ? 'bg-gray-800/50 text-gray-200 placeholder-gray-400 focus:bg-gray-800'
+                        : 'bg-white/50 text-gray-800 placeholder-gray-500 focus:bg-white'
+                    }`}
+                  />
+                  <MagnifyingGlassIcon className="absolute left-3 w-4 h-4 text-white" />
+                </div>
               </div>
 
               {accounts.length === 0 ? (

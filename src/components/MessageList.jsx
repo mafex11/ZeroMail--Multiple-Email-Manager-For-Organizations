@@ -22,7 +22,6 @@ function MessageList({
   selectedAccount = 'all',
   onAccountChange
 }) {
-  const [sortBy, setSortBy] = useState('date')
   const [sortOrder, setSortOrder] = useState('desc')
   const [readFilter, setReadFilter] = useState('all')
 
@@ -151,18 +150,18 @@ function MessageList({
         <select
           value={selectedAccount}
           onChange={(e) => onAccountChange(e.target.value)}
-          className={`bg-transparent border rounded-lg px-2 py-1.5 text-sm font-medium w-[140px] ${
+          className={`backdrop-blur-md border  rounded-lg px-2 py-1.5 text-sm font-medium w-[140px] ${
             isDarkMode 
-              ? 'border-gray-700 text-gray-300 hover:border-gray-500 focus:border-gray-500 bg-gray-800'
-              : 'border-gmail-gray/20 text-gmail-gray hover:border-gmail-blue focus:border-gmail-blue'
+              ? 'border-gray-700/50 text-gray-300  hover:border-gray-500 focus:border-gray-500 bg-gray-800/30'
+              : 'border-gmail-gray/20 text-gmail-gray hover:border-gmail-blue focus:border-gmail-blue bg-white/30'
           } focus:outline-none`}
         >
-          <option value="all" className={isDarkMode ? 'bg-gray-800 text-gray-300' : ''}>All Accounts</option>
+          <option value="all" className={isDarkMode ? 'bg-gray-800/80 text-gray-300' : 'bg-white/80'}>All Accounts</option>
           {accounts.map(account => (
             <option 
               key={account.email} 
               value={account.email}
-              className={isDarkMode ? 'bg-gray-800 text-gray-300' : ''}
+              className={isDarkMode ? 'bg-gray-800/80 text-gray-300' : 'bg-white/80'}
             >
               {account.email}
             </option>
@@ -170,7 +169,7 @@ function MessageList({
         </select>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 ">
         {sortedMessages.length > 0 ? (
           sortedMessages.map((message, index) => {
             const { date, time } = formatDate(message.date)
@@ -197,16 +196,17 @@ function MessageList({
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <div className={`text-lg flex-1 ${
-                        message.isUnread 
-                          ? !isDarkMode
-                            ? 'font-semibold text-gray-900'
-                            : 'font-semibold text-white'
-                          : !isDarkMode
-                            ? 'font-medium text-gray-700'
-                            : 'font-medium text-gray-300'
+                      <div className={`truncate ${
+                        isDarkMode 
+                          ? `text-lg ${message.isUnread ? 'font-medium' : 'font-light'} text-white` 
+                          : `text-lg ${message.isUnread ? 'font-medium' : 'font-light'} text-gray-900`
                       }`}>
                         {senderName}
+                      </div>
+                      <div className={`flex-shrink-0 text-xs ${
+                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        {time}
                       </div>
                       <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
                         {showArchive && (
@@ -231,19 +231,13 @@ function MessageList({
                         />
                       </div>
                     </div>
-                    <div className={`text-mdd mt-1 truncate ${
-                      message.isUnread
-                        ? !isDarkMode
-                          ? 'font-semibold text-gray-800'
-                          : 'font-semibold text-gray-200'
-                        : !isDarkMode
-                          ? 'font-medium text-gray-600'
-                          : 'font-medium text-gray-400'
+                    <div className={`truncate ${
+                      isDarkMode ? 'text-sm font-light text-gray-300' : 'text-sm font-light text-gray-600'
                     }`}>
                       {message.subject}
                     </div>
-                    <div className={`text-xs line-clamp-1 mt-1 ${
-                      !isDarkMode ? 'text-gmail-gray' : 'text-gray-500'
+                    <div className={`truncate text-xs ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     }`}>
                       {message.snippet}
                     </div>

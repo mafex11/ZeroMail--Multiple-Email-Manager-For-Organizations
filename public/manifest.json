@@ -1,14 +1,26 @@
 {
   "manifest_version": 3,
-  "name": "Zero Mail",
-  "version": "1.0",
-  "description": "Manage multiple Gmail accounts and view your emails in one place",
+  "name": "Fusion Mail",
+  "version": "1.0.0",
+  "description": "A streamlined Gmail experience with seamless account integration",
   "permissions": [
     "identity",
     "storage"
   ],
+  "web_accessible_resources": [{
+    "resources": [
+      "src/assets/bg.png",
+      "src/assets/email-envelope-close--Streamline-Pixel.svg"
+    ],
+    "matches": ["<all_urls>"]
+  }],
   "action": {
-    "default_popup": "index.html"
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
   },
   "oauth2": {
     "client_id": "78669493829-j94lrbse4jre3slbe2ol613sbn288mqf.apps.googleusercontent.com",
