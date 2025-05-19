@@ -5,7 +5,9 @@ import {
   ArchiveBoxIcon,
   EnvelopeIcon,
   EnvelopeOpenIcon,
-  StarIcon
+  StarIcon,
+  InboxIcon,
+  ClockIcon
 } from '@heroicons/react/24/outline'
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid'
 
@@ -22,7 +24,7 @@ function MessageList({
 }) {
   const [sortBy, setSortBy] = useState('date')
   const [sortOrder, setSortOrder] = useState('desc')
-  const [showUnreadFirst, setShowUnreadFirst] = useState(false)
+  const [readFilter, setReadFilter] = useState('all')
 
   const getAccountProfilePicture = (accountEmail) => {
     const account = accounts.find(acc => acc.email === accountEmail)
@@ -33,24 +35,16 @@ function MessageList({
     return [...messages].sort((a, b) => {
       let comparison = 0
       
-      // Always apply unread sorting first if enabled
-      if (showUnreadFirst) {
+      // Apply read/unread filter if not set to 'all'
+      if (readFilter !== 'all') {
+        const wantUnread = readFilter === 'unread'
         if (a.isUnread !== b.isUnread) {
-          return a.isUnread ? -1 : 1
+          return wantUnread ? (a.isUnread ? -1 : 1) : (a.isUnread ? 1 : -1)
         }
       }
       
-      // Then apply the selected sort
-      switch (sortBy) {
-        case 'date':
-          comparison = new Date(a.date) - new Date(b.date)
-          break
-        case 'sender':
-          comparison = a.from.localeCompare(b.from)
-          break
-        default:
-          comparison = new Date(a.date) - new Date(b.date)
-      }
+      // Then apply date sort
+      comparison = new Date(a.date) - new Date(b.date)
       return sortOrder === 'asc' ? comparison : -comparison
     })
   }
@@ -69,13 +63,8 @@ function MessageList({
     return match ? match[1].trim() : from
   }
 
-  const handleSort = (field) => {
-    if (sortBy === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-    } else {
-      setSortBy(field)
-      setSortOrder('desc')
-    }
+  const handleSort = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
   }
 
   const handleAction = (e, action, message) => {
@@ -116,65 +105,66 @@ function MessageList({
         <div className="flex items-center gap-3">
           <span className="font-medium">Sort by:</span>
           <button
-            onClick={() => handleSort('sender')}
-            className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
-              sortBy === 'sender' 
-                ? 'bg-gmail-blue text-white font-medium' 
-                : !isDarkMode
-                  ? 'hover:bg-gmail-blue/10'
-                  : 'hover:bg-gray-700'
-            }`}
+            onClick={handleSort}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors bg-gmail-blue text-white font-medium`}
           >
-            Name
-            {sortBy === 'sender' && (
-              sortOrder === 'asc' ? <ChevronUpIcon className="h-4 w-4 ml-1" /> : <ChevronDownIcon className="h-4 w-4 ml-1" />
-            )}
+            <ClockIcon className="w-4 h-4" />
+            <span>Recent</span>
+            {sortOrder === 'asc' ? <ChevronUpIcon className="h-4 w-4 ml-1" /> : <ChevronDownIcon className="h-4 w-4 ml-1" />}
           </button>
           <button
-            onClick={() => handleSort('date')}
-            className={`flex items-center px-3 py-1.5 rounded-full transition-colors ${
-              sortBy === 'date' 
-                ? 'bg-gmail-blue text-white font-medium' 
-                : !isDarkMode
-                  ? 'hover:bg-gmail-blue/10'
-                  : 'hover:bg-gray-700'
-            }`}
-          >
-            Recent
-            {sortBy === 'date' && (
-              sortOrder === 'asc' ? <ChevronUpIcon className="h-4 w-4 ml-1" /> : <ChevronDownIcon className="h-4 w-4 ml-1" />
-            )}
-          </button>
-          <button
-            onClick={() => setShowUnreadFirst(prev => !prev)}
-            className={`flex items-center justify-center px-3 py-1.5 rounded-full transition-colors w-[80px] ${
-              showUnreadFirst 
+            onClick={() => setReadFilter(prev => {
+              // Cycle through states: all -> unread -> read -> all
+              switch(prev) {
+                case 'all': return 'unread'
+                case 'unread': return 'read'
+                case 'read': return 'all'
+                default: return 'all'
+              }
+            })}
+            className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full transition-colors min-w-[90px] ${
+              readFilter !== 'all'
                 ? 'bg-gmail-blue text-white font-medium' 
                 : !isDarkMode
                   ? 'bg-gray-200 text-gray-600 hover:bg-gray-300'
                   : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
             }`}
           >
-            {showUnreadFirst ? 'Read' : 'Unread'}
+            {readFilter === 'all' ? (
+              <>
+                <InboxIcon className="w-4 h-4" />
+                <span>All</span>
+              </>
+            ) : readFilter === 'unread' ? (
+              <>
+                <EnvelopeIcon className="w-4 h-4" />
+                <span>Unread</span>
+              </>
+            ) : (
+              <>
+                <EnvelopeOpenIcon className="w-4 h-4" />
+                <span>Read</span>
+              </>
+            )}
           </button>
         </div>
         <select
           value={selectedAccount}
           onChange={(e) => onAccountChange(e.target.value)}
-          className={`bg-transparent border rounded-lg px-2 py-1.5 text-sm font-medium w-[100px] ${
+          className={`bg-transparent border rounded-lg px-2 py-1.5 text-sm font-medium w-[140px] ${
             isDarkMode 
               ? 'border-gray-700 text-gray-300 hover:border-gray-500 focus:border-gray-500 bg-gray-800'
               : 'border-gmail-gray/20 text-gmail-gray hover:border-gmail-blue focus:border-gmail-blue'
           } focus:outline-none`}
         >
-          <option value="all" className={isDarkMode ? 'bg-gray-800 text-gray-300' : ''}>All</option>
+          <option value="all" className={isDarkMode ? 'bg-gray-800 text-gray-300' : ''}>All Accounts</option>
           {accounts.map(account => (
             <option 
               key={account.email} 
               value={account.email}
               className={isDarkMode ? 'bg-gray-800 text-gray-300' : ''}
             >
-              {account.email.split('@')[0]}
+              {account.email}
             </option>
           ))}
         </select>
@@ -182,7 +172,7 @@ function MessageList({
 
       <div className="space-y-2">
         {sortedMessages.length > 0 ? (
-          sortedMessages.map((message) => {
+          sortedMessages.map((message, index) => {
             const { date, time } = formatDate(message.date)
             const senderName = extractSenderName(message.from)
             
@@ -195,13 +185,19 @@ function MessageList({
                   !isDarkMode 
                     ? 'hover:bg-gmail-hover' 
                     : 'hover:bg-gray-800'
+                } ${
+                  index !== sortedMessages.length - 1
+                    ? !isDarkMode
+                      ? 'border-b border-gray-200'
+                      : 'border-b border-gray-700'
+                    : ''
                 }`}
                 onClick={() => window.open(`https://mail.google.com/mail/u/${message.accountEmail}/#inbox/${message.id}`, '_blank')}
               >
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <div className={`text-sm flex-1 ${
+                      <div className={`text-lg flex-1 ${
                         message.isUnread 
                           ? !isDarkMode
                             ? 'font-semibold text-gray-900'
@@ -235,7 +231,7 @@ function MessageList({
                         />
                       </div>
                     </div>
-                    <div className={`text-sm mt-1 truncate ${
+                    <div className={`text-mdd mt-1 truncate ${
                       message.isUnread
                         ? !isDarkMode
                           ? 'font-semibold text-gray-800'

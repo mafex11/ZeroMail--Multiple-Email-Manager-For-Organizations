@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Cog6ToothIcon, PlusIcon, ClockIcon, EnvelopeIcon, UserGroupIcon, ArrowPathIcon, SunIcon, MoonIcon, InboxIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline'
+import { Cog6ToothIcon, PlusIcon, EnvelopeIcon, ArrowPathIcon, SunIcon, MoonIcon, InboxIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline'
 import MessageList from './components/MessageList'
 import SettingsPage from './components/SettingsPage'
 import AvatarPage from './components/AvatarPage'
 import { mockMessages } from './mockData'
+import bgImage from './assets/bg.png'
 
 const clientId = '78669493829-j94lrbse4jre3slbe2ol613sbn288mqf.apps.googleusercontent.com'
 const redirectUri = 'https://nmgohjeebbjdpackknbamacpelkkbmcc.chromiumapp.org/'
@@ -18,14 +19,13 @@ const SCOPES = [
 function App() {
   const [accounts, setAccounts] = useState([])
   const [messages, setMessages] = useState({ inbox: [], sent: [], all: [] })
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState(null)
   const [currentPage, setCurrentPage] = useState('main')
-  const [sortBy, setSortBy] = useState('recent')
+  const [messageFilter, setMessageFilter] = useState('inbox')
   const [selectedAccount, setSelectedAccount] = useState('all')
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [messageFilter, setMessageFilter] = useState('inbox')
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -54,9 +54,8 @@ function App() {
               profilePicture: 'https://lh3.googleusercontent.com/a/default-user=s32-c'
             }
           ])
-          const storage = await chrome.storage.local.get('isDarkMode')
-          setIsDarkMode(storage.isDarkMode ?? true)
-          setLoading(false)
+          // In dev mode, just use default dark mode
+          setIsDarkMode(true)
           return
         }
 
@@ -65,18 +64,18 @@ function App() {
         const savedAccounts = storage.accounts || []
         const cachedMessages = storage.cachedMessages || { inbox: [], sent: [], all: [] }
         
-        // Set initial state from cache
+        // Set initial state from cache immediately
         setAccounts(savedAccounts)
         setIsDarkMode(storage.isDarkMode ?? true)
-        
-        // Always set cached messages first if available
-        if (cachedMessages.inbox.length > 0 || cachedMessages.sent.length > 0 || cachedMessages.all.length > 0) {
-          console.log('Setting cached messages:', cachedMessages)
-          setMessages(cachedMessages)
+        setMessages(cachedMessages)
+
+        // If we have accounts but no cached messages, show loading state
+        if (savedAccounts.length > 0 && 
+            cachedMessages.inbox.length === 0 && 
+            cachedMessages.sent.length === 0 && 
+            cachedMessages.all.length === 0) {
+          setLoading(true)
         }
-        
-        // Remove loading screen since we have either cached data or empty state
-        setLoading(false)
 
         // If we have accounts, refresh ALL message types for ALL accounts in background
         if (savedAccounts.length > 0) {
@@ -100,6 +99,7 @@ function App() {
             
             // Set the fresh messages
             setMessages(freshMessages)
+            setLoading(false) // Ensure loading is false after refresh
             
             // Update cache
             await chrome.storage.local.set({
@@ -111,6 +111,7 @@ function App() {
             setError('Some messages failed to load. Please try refreshing.')
           } finally {
             setRefreshing(false)
+            setLoading(false)
           }
         }
       } catch (error) {
@@ -169,7 +170,7 @@ function App() {
           let query = ''
           switch (type) {
             case 'inbox':
-              query = 'label:inbox -in:spam -in:trash'
+              query = 'label:inbox category:primary -in:spam -in:trash'
               break
             case 'sent':
               query = 'in:sent -in:spam -in:trash'
@@ -178,7 +179,7 @@ function App() {
               query = '-in:spam -in:trash -in:drafts'
               break
             default:
-              query = 'label:inbox -in:spam -in:trash'
+              query = 'label:inbox category:primary -in:spam -in:trash'
           }
 
           // Fetch message list
@@ -620,13 +621,7 @@ function App() {
         filtered = [...messages.sent];
         break;
       case 'all':
-      case 'recent':
-        // For 'all' and 'recent', use the dedicated all mail list
         filtered = [...messages.all];
-        break;
-      case 'unread':
-        // For unread, filter from all messages
-        filtered = messages.all.filter(msg => msg.isUnread);
         break;
       default:
         filtered = [...messages.all];
@@ -637,43 +632,20 @@ function App() {
       filtered = filtered.filter(msg => msg.accountEmail === selectedAccount);
     }
 
-    // Sort messages
-    if (sortBy === 'recent' || messageFilter === 'recent') {
-      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-    } else if (sortBy === 'unread' || messageFilter === 'unread') {
-      filtered.sort((a, b) => {
-        // Sort unread first, then by date
-        if (a.isUnread !== b.isUnread) {
-          return b.isUnread ? 1 : -1;
-        }
-        return new Date(b.date) - new Date(a.date);
-      });
-    }
+    // Sort messages by date (most recent first)
+    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     return filtered;
   };
 
   const FilterButton = ({ type, icon: Icon, label }) => {
-    // For unread/read filter, show dynamic label based on current state
-    const buttonLabel = type === 'unread' 
-      ? messageFilter === 'unread' ? 'Read' : 'Unread'
-      : label
-
     return (
       <button
         onClick={() => {
-          if (type === 'unread') {
-            // Toggle between showing unread and read messages
-            setMessageFilter(messageFilter === 'unread' ? 'read' : 'unread')
-          } else {
-            setMessageFilter(type)
-            if (type === 'recent') {
-              setSortBy('recent')
-            }
-          }
+          setMessageFilter(type)
         }}
         className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-colors ${
-          messageFilter === type || messageFilter === 'read' && type === 'unread'
+          messageFilter === type
             ? isDarkMode 
               ? 'bg-gmail-blue text-white font-medium'
               : 'bg-gmail-blue text-white font-medium'
@@ -683,11 +655,9 @@ function App() {
         }`}
       >
         <Icon className={`h-4 w-4 ${
-          messageFilter === type || messageFilter === 'read' && type === 'unread'
-            ? 'text-white' 
-            : ''
+          messageFilter === type ? 'text-white' : ''
         }`} />
-        <span>{buttonLabel}</span>
+        <span>{label}</span>
       </button>
     )
   }
@@ -702,44 +672,46 @@ function App() {
     return (
       <div className={`w-[500px] h-[600px] ${isDarkMode ? 'dark bg-gray-900' : 'bg-white'}`}>
         <div className="flex items-center justify-center h-full">
-          <div className="animate-spin rounded-full h-10 w-10 border-4 border-gmail-blue border-t-transparent"></div>
+          <div className="flex flex-col items-center gap-3">
+            <div className="animate-spin rounded-full h-10 w-10 border-4 border-gmail-blue border-t-transparent"></div>
+            <p className="text-sm text-white">Setting up your account...</p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className={`w-[500px] h-[600px] flex flex-col ${isDarkMode ? 'dark bg-gray-900' : 'bg-white'}`}>
-      <div className={`flex items-center justify-between p-4 border-b ${
-        isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gmail-blue/10'
+    <div className={`bg-bottom-left w-[500px] h-[600px] flex flex-col ${isDarkMode ? 'dark' : ''}`}
+         style={{
+           backgroundImage: `url(${bgImage})`,
+           backgroundSize: 'cover',
+           backgroundPosition: 'left'
+         }}>
+      <div className={`flex items-center justify-between p-4 border-b backdrop-blur-md ${
+        isDarkMode ? 'bg-gray-800/30 border-gray-700' : 'bg-white/30 border-gray-200'
       } sticky top-0 z-10`}>
         <div className={`font-semibold text-2xl tracking-tight select-none ${
           isDarkMode ? 'text-white' : 'text-gmail-blue'
         }`}>
           Zero Mail
         </div>
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2`}>
           <button 
             onClick={refreshMessages}
             disabled={refreshing}
             className={`p-2 rounded-full transition-colors ${
               refreshing 
-                ? 'text-gray-500 cursor-not-allowed'
-                : isDarkMode
-                  ? 'text-gray-400 hover:bg-gray-700'
-                  : 'text-gmail-gray hover:bg-gmail-blue/20'
+                ? 'text-white/50 cursor-not-allowed'
+                : 'text-white hover:bg-white/10'
             }`}
             aria-label="Refresh"
           >
             <ArrowPathIcon className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
           </button>
-          <button
+          {/* <button
             onClick={toggleDarkMode}
-            className={`p-2 rounded-full transition-colors ${
-              isDarkMode
-                ? 'text-gray-400 hover:bg-gray-700'
-                : 'text-gmail-gray hover:bg-gmail-blue/20'
-            }`}
+            className="p-2 rounded-full transition-colors text-white hover:bg-white/10"
             aria-label={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             {isDarkMode ? (
@@ -747,25 +719,17 @@ function App() {
             ) : (
               <MoonIcon className="h-5 w-5" />
             )}
-          </button>
+          </button> */}
           <button 
             onClick={handleAddAccount}
-            className={`p-2 rounded-full transition-colors ${
-              isDarkMode
-                ? 'text-gray-400 hover:bg-gray-700'
-                : 'text-gmail-gray hover:bg-gmail-blue/20'
-            }`}
+            className="p-2 rounded-full transition-colors text-white hover:bg-white/10"
             aria-label="Add Account"
           >
             <PlusIcon className="h-6 w-6" />
           </button>
           <button 
             onClick={() => setCurrentPage('settings')}
-            className={`p-2 rounded-full transition-colors ${
-              isDarkMode
-                ? 'text-gray-400 hover:bg-gray-700'
-                : 'text-gmail-gray hover:bg-gmail-blue/20'
-            }`}
+            className="p-2 rounded-full transition-colors text-white hover:bg-white/10"
             aria-label="Settings"
           >
             <Cog6ToothIcon className="h-6 w-6" />
@@ -773,9 +737,9 @@ function App() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto backdrop-blur-md bg-black/5">
         {currentPage === 'main' && (
-          <div className={`p-4 ${isDarkMode ? 'text-gray-300' : ''}`}>
+          <div className={`p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
             {error && (
               <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center justify-between">
                 <span className="font-medium">{error}</span>
@@ -794,17 +758,9 @@ function App() {
                 <FilterButton type="all" icon={EnvelopeIcon} label="All" />
                 <FilterButton type="inbox" icon={InboxIcon} label="Inbox" />
                 <FilterButton type="sent" icon={PaperAirplaneIcon} label="Sent" />
-                <FilterButton type="recent" icon={ClockIcon} label="Recent" />
-                <FilterButton type="unread" icon={EnvelopeIcon} label="Unread" />
               </div>
 
-              {loading ? (
-                <div className="flex items-center justify-center h-[400px]">
-                  <div className={`animate-spin rounded-full h-10 w-10 border-4 border-t-transparent ${
-                    isDarkMode ? 'border-gray-600' : 'border-gmail-blue'
-                  }`}></div>
-                </div>
-              ) : accounts.length === 0 ? (
+              {accounts.length === 0 ? (
                 <div className={`flex flex-col items-center justify-center h-[400px] ${
                   isDarkMode ? 'text-gray-400' : 'text-gmail-gray'
                 }`}>
@@ -818,7 +774,7 @@ function App() {
                     Add your first account
         </button>
                 </div>
-              ) : messages.all.length === 0 ? (
+              ) : messages.all.length === 0 && !refreshing ? (
                 <div className={`flex items-center justify-center h-[400px] ${
                   isDarkMode ? 'text-gray-400' : 'text-gmail-gray'
                 }`}>
