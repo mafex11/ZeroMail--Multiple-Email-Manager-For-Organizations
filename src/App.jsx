@@ -61,29 +61,54 @@ function App() {
         }
 
         // Load accounts and cached messages first
-        const storage = await chrome.storage.local.get(['accounts', 'cachedMessages'])
+        const storage = await chrome.storage.local.get(['accounts', 'cachedMessages', 'isDarkMode'])
         const savedAccounts = storage.accounts || []
         const cachedMessages = storage.cachedMessages || { inbox: [], sent: [], all: [] }
         
         // Set initial state from cache
         setAccounts(savedAccounts)
-        if (cachedMessages.all.length > 0) {
+        setIsDarkMode(storage.isDarkMode ?? true)
+        
+        // Always set cached messages first if available
+        if (cachedMessages.inbox.length > 0 || cachedMessages.sent.length > 0 || cachedMessages.all.length > 0) {
+          console.log('Setting cached messages:', cachedMessages)
           setMessages(cachedMessages)
         }
         
         // Remove loading screen since we have either cached data or empty state
         setLoading(false)
 
-        // If we have accounts, refresh messages in the background
+        // If we have accounts, refresh ALL message types for ALL accounts in background
         if (savedAccounts.length > 0) {
+          console.log('Starting background refresh for all accounts...')
           setRefreshing(true)
           try {
-            // Load all mail types in parallel
-            await Promise.all([
-              loadMessages(savedAccounts, 'all'),
-              loadMessages(savedAccounts, 'inbox'),
-              loadMessages(savedAccounts, 'sent')
-            ])
+            // Load all message types in parallel for all accounts
+            const messageTypes = ['all', 'inbox', 'sent']
+            const refreshPromises = messageTypes.map(type => loadMessages(savedAccounts, type))
+            
+            // Wait for all message types to load
+            const results = await Promise.all(refreshPromises)
+            console.log('Background refresh completed:', results)
+            
+            // Update cache with fresh data
+            const freshMessages = {
+              inbox: results[1], // inbox was second in the array
+              sent: results[2],  // sent was third
+              all: results[0]    // all was first
+            }
+            
+            // Set the fresh messages
+            setMessages(freshMessages)
+            
+            // Update cache
+            await chrome.storage.local.set({
+              cachedMessages: freshMessages,
+              lastFetch: Date.now()
+            })
+          } catch (error) {
+            console.error('Error refreshing messages:', error)
+            setError('Some messages failed to load. Please try refreshing.')
           } finally {
             setRefreshing(false)
           }
@@ -120,15 +145,14 @@ function App() {
   const loadMessages = async (accountsToLoad, type = 'inbox') => {
     try {
       if (!accountsToLoad || accountsToLoad.length === 0) {
-        setMessages(prev => ({ ...prev, [type]: [], all: [] }))
-        return
+        return []
       }
 
       const allMessages = []
       const failedAccounts = []
-      const messagePromises = []
 
-      for (const account of accountsToLoad) {
+      // Process each account in parallel
+      const accountPromises = accountsToLoad.map(async account => {
         try {
           // First, verify the token still works
           const testResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
@@ -138,7 +162,7 @@ function App() {
           if (!testResponse.ok) {
             console.error(`Token invalid for ${account.email}`)
             failedAccounts.push(account.email)
-            continue
+            return []
           }
 
           // Construct query based on type
@@ -151,94 +175,92 @@ function App() {
               query = 'in:sent -in:spam -in:trash'
               break
             case 'all':
-              // Fetch all mail except spam, trash, and drafts
               query = '-in:spam -in:trash -in:drafts'
               break
             default:
               query = 'label:inbox -in:spam -in:trash'
           }
 
-          // Fetch message list and details in parallel for each account
-          const messagesPromise = fetch(
+          // Fetch message list
+          const messagesResponse = await fetch(
             `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=50&q=${encodeURIComponent(query)}`,
             {
               headers: {
                 Authorization: `Bearer ${account.accessToken}`,
               },
             }
-          ).then(async (response) => {
-            if (!response.ok) throw new Error(`Failed to fetch messages: ${response.statusText}`)
-            const data = await response.json()
-            if (!data.messages || !Array.isArray(data.messages)) {
-              console.error(`Invalid message data for ${account.email}:`, data)
-              return []
-            }
+          )
 
-            // Fetch all message details in parallel
-            const detailsPromises = data.messages.map(message =>
-              fetch(
-                `https://gmail.googleapis.com/gmail/v1/users/me/messages/${message.id}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${account.accessToken}`,
-                  },
-                }
-              ).then(async (messageResponse) => {
-                if (!messageResponse.ok) throw new Error(`Failed to fetch message details: ${messageResponse.statusText}`)
-                const messageData = await messageResponse.json()
-                
-                if (!messageData || !messageData.payload || !messageData.payload.headers) {
-                  console.error('Invalid message data structure:', messageData)
-                  return null
-                }
+          if (!messagesResponse.ok) {
+            throw new Error(`Failed to fetch messages: ${messagesResponse.statusText}`)
+          }
 
-                const headers = messageData.payload.headers
-                const subject = headers.find((h) => h.name === 'Subject')?.value || '(No Subject)'
-                const from = headers.find((h) => h.name === 'From')?.value || 'Unknown'
-                const date = headers.find((h) => h.name === 'Date')?.value || new Date().toISOString()
-                const labels = messageData.labelIds || []
-                const isUnread = labels.includes('UNREAD')
-                const isSent = labels.includes('SENT')
-                const isInbox = labels.includes('INBOX')
-                const messageType = type // Store the original query type
-
-                return {
-                  id: message.id,
-                  subject,
-                  from,
-                  date: new Date(date).toISOString(),
-                  snippet: messageData.snippet || '',
-                  accountEmail: account.email,
-                  isUnread,
-                  isSent,
-                  isInbox,
-                  labels,
-                  messageType
-                }
-              }).catch(error => {
-                console.error(`Error processing message:`, error)
-                return null
-              })
-            )
-
-            const messages = await Promise.all(detailsPromises)
-            return messages.filter(msg => msg !== null)
-          }).catch(error => {
-            console.error(`Error fetching messages for ${account.email}:`, error)
-            failedAccounts.push(account.email)
+          const data = await messagesResponse.json()
+          if (!data.messages || !Array.isArray(data.messages)) {
+            console.error(`Invalid message data for ${account.email}:`, data)
             return []
-          })
+          }
 
-          messagePromises.push(messagesPromise)
+          // Fetch all message details in parallel
+          const detailsPromises = data.messages.map(message =>
+            fetch(
+              `https://gmail.googleapis.com/gmail/v1/users/me/messages/${message.id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${account.accessToken}`,
+                },
+              }
+            ).then(async (messageResponse) => {
+              if (!messageResponse.ok) {
+                throw new Error(`Failed to fetch message details: ${messageResponse.statusText}`)
+              }
+              const messageData = await messageResponse.json()
+              
+              if (!messageData || !messageData.payload || !messageData.payload.headers) {
+                console.error('Invalid message data structure:', messageData)
+                return null
+              }
+
+              const headers = messageData.payload.headers
+              const subject = headers.find((h) => h.name === 'Subject')?.value || '(No Subject)'
+              const from = headers.find((h) => h.name === 'From')?.value || 'Unknown'
+              const date = headers.find((h) => h.name === 'Date')?.value || new Date().toISOString()
+              const labels = messageData.labelIds || []
+              const isUnread = labels.includes('UNREAD')
+              const isSent = labels.includes('SENT')
+              const isInbox = labels.includes('INBOX')
+
+              return {
+                id: message.id,
+                subject,
+                from,
+                date: new Date(date).toISOString(),
+                snippet: messageData.snippet || '',
+                accountEmail: account.email,
+                isUnread,
+                isSent,
+                isInbox,
+                labels,
+                messageType: type
+              }
+            }).catch(error => {
+              console.error(`Error processing message:`, error)
+              return null
+            })
+          )
+
+          const messages = await Promise.all(detailsPromises)
+          return messages.filter(msg => msg !== null)
         } catch (error) {
           console.error(`Error processing account ${account.email}:`, error)
           failedAccounts.push(account.email)
+          return []
         }
-      }
+      })
 
-      // Wait for all message fetching to complete
-      const messageResults = await Promise.all(messagePromises)
-      allMessages.push(...messageResults.flat())
+      // Wait for all accounts to be processed
+      const accountResults = await Promise.all(accountPromises)
+      allMessages.push(...accountResults.flat())
 
       // Remove failed accounts
       if (failedAccounts.length > 0) {
@@ -248,30 +270,20 @@ function App() {
         
         if (failedAccounts.length === accountsToLoad.length) {
           setError('Failed to load messages. Please try adding your account again.')
+          return []
         }
       }
 
       // Sort messages by date
       const sortedMessages = allMessages.sort((a, b) => new Date(b.date) - new Date(a.date))
       
-      // Update messages state based on type
-      setMessages(prev => {
-        const newMessages = {
-          ...prev,
-          [type]: sortedMessages
-        }
-        return newMessages
-      })
-
-      // Cache the messages
-      await chrome.storage.local.set({ 
-        cachedMessages: messages,
-        lastFetch: Date.now()
-      })
+      // Return the sorted messages
+      return sortedMessages
 
     } catch (error) {
       console.error('Error in loadMessages:', error)
       setError('Failed to load messages. Please try again.')
+      return []
     }
   }
 
@@ -641,35 +653,44 @@ function App() {
     return filtered;
   };
 
-  const FilterButton = ({ type, icon: Icon, label }) => (
-    <button
-      onClick={() => {
-        setMessageFilter(type)
-        if (type === 'recent') {
-          setSortBy('recent')
-        } else if (type === 'unread') {
-          setSortBy('unread')
-        }
-        refreshMessages()
-      }}
-      className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-colors ${
-        messageFilter === type || (type === 'recent' && sortBy === 'recent') || (type === 'unread' && sortBy === 'unread')
-          ? isDarkMode 
-            ? 'bg-gmail-blue text-white font-medium'
-            : 'bg-gmail-blue text-white font-medium'
-          : isDarkMode
-            ? 'text-gray-400 hover:bg-gray-700'
-            : 'text-gmail-gray hover:bg-gmail-blue/10'
-      }`}
-    >
-      <Icon className={`h-4 w-4 ${
-        messageFilter === type || (type === 'recent' && sortBy === 'recent') || (type === 'unread' && sortBy === 'unread')
-          ? 'text-white' 
-          : ''
-      }`} />
-      <span>{label}</span>
-    </button>
-  )
+  const FilterButton = ({ type, icon: Icon, label }) => {
+    // For unread/read filter, show dynamic label based on current state
+    const buttonLabel = type === 'unread' 
+      ? messageFilter === 'unread' ? 'Read' : 'Unread'
+      : label
+
+    return (
+      <button
+        onClick={() => {
+          if (type === 'unread') {
+            // Toggle between showing unread and read messages
+            setMessageFilter(messageFilter === 'unread' ? 'read' : 'unread')
+          } else {
+            setMessageFilter(type)
+            if (type === 'recent') {
+              setSortBy('recent')
+            }
+          }
+        }}
+        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-colors ${
+          messageFilter === type || messageFilter === 'read' && type === 'unread'
+            ? isDarkMode 
+              ? 'bg-gmail-blue text-white font-medium'
+              : 'bg-gmail-blue text-white font-medium'
+            : isDarkMode
+              ? 'text-gray-400 hover:bg-gray-700'
+              : 'text-gmail-gray hover:bg-gmail-blue/10'
+        }`}
+      >
+        <Icon className={`h-4 w-4 ${
+          messageFilter === type || messageFilter === 'read' && type === 'unread'
+            ? 'text-white' 
+            : ''
+        }`} />
+        <span>{buttonLabel}</span>
+      </button>
+    )
+  }
 
   const toggleDarkMode = async () => {
     const newDarkMode = !isDarkMode
