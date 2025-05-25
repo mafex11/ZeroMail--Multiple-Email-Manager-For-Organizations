@@ -5,7 +5,20 @@
   "description": "A streamlined Gmail experience with seamless account integration",
   "permissions": [
     "identity",
-    "storage"
+    "storage",
+    "activeTab",
+    "clipboardWrite",
+    "notifications"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-script.js"],
+      "run_at": "document_end"
+    }
   ],
   "web_accessible_resources": [{
     "resources": [

@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react'
-import { Cog6ToothIcon, PlusIcon, EnvelopeIcon, ArrowPathIcon, SunIcon, MoonIcon, InboxIcon, PaperAirplaneIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { Cog6ToothIcon, PlusIcon, EnvelopeIcon, ArrowPathIcon, SunIcon, MoonIcon, InboxIcon, PaperAirplaneIcon, MagnifyingGlassIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline'
+import { ShimmerButton } from './components/magicui/shimmer-button'
+import { subscriptionService } from './utils/subscriptionService'
 import MessageList from './components/MessageList'
 import SettingsPage from './components/SettingsPage'
 import AvatarPage from './components/AvatarPage'
+import OTPIndicator from './components/OTPIndicator'
 import { mockMessages } from './mockData'
+import { otpService } from './utils/otpService'
+import { performanceMonitor } from './utils/performance'
 import bgImage from './assets/bg.png'
 import logo from './assets/email-envelope-close--Streamline-Pixel.svg'
+import ChatPage from './components/ChatPage'
 import './styles.css'
 
 const clientId = '78669493829-j94lrbse4jre3slbe2ol613sbn288mqf.apps.googleusercontent.com'
-const redirectUri = 'https://nmgohjeebbjdpackknbamacpelkkbmcc.chromiumapp.org/'
 const SCOPES = [
   'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/userinfo.profile',
@@ -32,7 +37,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('')
   const [bgLoaded, setBgLoaded] = useState(false)
 
-  // Background refresh interval (15 seconds)
+  // Background refresh interval (30 seconds - reduced frequency)
   useEffect(() => {
     // Don't set up interval if no accounts
     if (accounts.length === 0) return;
@@ -54,11 +59,11 @@ function App() {
           setRefreshing(false);
         }
       }
-    }, 15000); // 15 seconds
+    }, 30000); // 30 seconds (reduced from 15)
 
     // Cleanup interval on unmount or when accounts change
     return () => clearInterval(intervalId);
-  }, [accounts, refreshing]); // Dependencies: accounts and refreshing state
+  }, [accounts]); // Removed refreshing dependency to prevent recreation
 
   // Preload background image
   useEffect(() => {
@@ -71,6 +76,9 @@ function App() {
     const initializeApp = async () => {
       try {
         setError(null)
+        
+        // Initialize OTP service
+        otpService.startMonitoring()
         
         // For development, use mock data
         if (import.meta.env.DEV) {
@@ -94,6 +102,11 @@ function App() {
               profilePicture: 'https://lh3.googleusercontent.com/a/default-user=s32-c'
             }
           ])
+          
+          // Process mock messages for OTP detection in development
+          console.log('Processing mock messages for OTP detection...')
+          otpService.processMessages(mockAll)
+          
           setLoading(false)
           setInitializing(false)
           return
@@ -165,25 +178,28 @@ function App() {
   }, [])
 
   const refreshMessages = async () => {
-    try {
-      setRefreshing(true)
-      setError(null)
-      console.log('Starting message refresh...')
-      // Refresh all mail types in parallel
-      await Promise.all([
-        loadMessages(accounts, messageFilter),
-        messageFilter === 'all' ? loadMessages(accounts, 'all') : Promise.resolve()
-      ])
-      console.log('Messages refreshed successfully')
-    } catch (error) {
-      console.error('Error during refresh:', error)
-      setError('Failed to refresh messages. Please try again.')
-    } finally {
-      setRefreshing(false)
-    }
+    return performanceMonitor.measureAsync('refreshMessages', async () => {
+      try {
+        setRefreshing(true)
+        setError(null)
+        console.log('Starting message refresh...')
+        // Refresh all mail types in parallel
+        await Promise.all([
+          loadMessages(accounts, messageFilter),
+          messageFilter === 'all' ? loadMessages(accounts, 'all') : Promise.resolve()
+        ])
+        console.log('Messages refreshed successfully')
+      } catch (error) {
+        console.error('Error during refresh:', error)
+        setError('Failed to refresh messages. Please try again.')
+      } finally {
+        setRefreshing(false)
+      }
+    })
   }
 
   const loadMessages = async (accountsToLoad, type = 'inbox') => {
+    return performanceMonitor.measureAsync(`loadMessages-${type}`, async () => {
     try {
       if (!accountsToLoad || accountsToLoad.length === 0) {
         return []
@@ -318,6 +334,11 @@ function App() {
       // Sort messages by date
       const sortedMessages = allMessages.sort((a, b) => new Date(b.date) - new Date(a.date))
       
+      // Process messages for OTP detection
+      if (sortedMessages.length > 0) {
+        otpService.processMessages(sortedMessages)
+      }
+      
       // Return the sorted messages
       return sortedMessages
 
@@ -326,13 +347,20 @@ function App() {
       setError('Failed to load messages. Please try again.')
       return []
     }
+    })
   }
 
   const handleAddAccount = async () => {
+    return performanceMonitor.measureAsync('addAccount', async () => {
     try {
       setError(null)
       setLoading(true)
       console.log('Starting account addition process...')
+      
+      const redirectUri = chrome?.identity?.getRedirectURL?.()
+      if (!redirectUri) {
+        throw new Error('Unable to get redirect URI from Chrome extension')
+      }
       
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${clientId}&` +
@@ -437,26 +465,35 @@ function App() {
         setAccounts(updatedAccounts)
         console.log('Account added successfully')
         
-        // Refresh messages after adding account
-        await refreshMessages()
-        console.log('Messages refreshed after adding account')
-      } catch (saveError) {
-        console.error('Failed to save account:', saveError)
-        throw new Error('Failed to save account')
-      }
-
-      // Load initial messages
-      console.log('Loading initial messages...')
-      try {
-        await Promise.all([
-          loadMessages([newAccount], 'all'),
-          loadMessages([newAccount], 'inbox'),
-          loadMessages([newAccount], 'sent')
+        // Load messages for ALL accounts (including the new one)
+        console.log('Loading messages for all accounts including new account...')
+        const [allMessages, inboxMessages, sentMessages] = await Promise.all([
+          loadMessages(updatedAccounts, 'all'),
+          loadMessages(updatedAccounts, 'inbox'),
+          loadMessages(updatedAccounts, 'sent')
         ])
-        console.log('Initial messages loaded successfully')
-      } catch (messageError) {
-        console.error('Failed to load initial messages:', messageError)
-        // Don't throw here, we still added the account successfully
+        
+        // Update the messages state immediately
+        setMessages({
+          all: allMessages,
+          inbox: inboxMessages,
+          sent: sentMessages
+        })
+        
+        // Update cache with the new messages
+        await chrome.storage.local.set({
+          cachedMessages: {
+            all: allMessages,
+            inbox: inboxMessages,
+            sent: sentMessages
+          },
+          lastFetch: Date.now()
+        })
+        
+        console.log('Messages loaded and state updated successfully')
+      } catch (saveError) {
+        console.error('Failed to save account or load messages:', saveError)
+        throw new Error('Failed to save account')
       }
 
     } catch (error) {
@@ -465,6 +502,7 @@ function App() {
     } finally {
       setLoading(false)
     }
+    })
   }
 
   const handleRemoveAccount = async (emailToRemove) => {
@@ -486,6 +524,7 @@ function App() {
   }
 
   const handleArchive = async (message) => {
+    return performanceMonitor.measureAsync('archiveMessage', async () => {
     try {
       const account = accounts.find(acc => acc.email === message.accountEmail)
       if (!account) return
@@ -562,6 +601,7 @@ function App() {
       console.error('Error archiving message:', error)
       setError('Failed to archive message. Please try again.')
     }
+    })
   }
 
   const handleToggleRead = async (message) => {
@@ -673,42 +713,45 @@ function App() {
   }
 
   const sortedMessages = () => {
-    let filtered = [];
-    
-    // Select message list based on filter
-    switch (messageFilter) {
-      case 'inbox':
-        filtered = [...messages.inbox];
-        break;
-      case 'sent':
-        filtered = [...messages.sent];
-        break;
-      case 'all':
-        filtered = [...messages.all];
-        break;
-      default:
-        filtered = [...messages.all];
-    }
-    
-    // Filter by selected account
-    if (selectedAccount !== 'all') {
-      filtered = filtered.filter(msg => msg.accountEmail === selectedAccount);
-    }
+    return performanceMonitor.measure('sortMessages', () => {
+      let filtered = [];
+      
+      // Select message list based on filter
+      switch (messageFilter) {
+        case 'inbox':
+          filtered = [...messages.inbox];
+          break;
+        case 'sent':
+          filtered = [...messages.sent];
+          break;
+        case 'all':
+          filtered = [...messages.all];
+          break;
+        default:
+          filtered = [...messages.all];
+      }
+      
+      // Filter by selected account
+      if (selectedAccount !== 'all') {
+        filtered = filtered.filter(msg => msg.accountEmail === selectedAccount);
+      }
 
-    // Filter by search term
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase().trim()
-      filtered = filtered.filter(msg => 
-        msg.subject.toLowerCase().includes(term) ||
-        msg.from.toLowerCase().includes(term) ||
-        msg.snippet.toLowerCase().includes(term)
-      )
-    }
+      // Filter by search term
+      if (searchTerm.trim()) {
+        const term = searchTerm.toLowerCase().trim()
+        filtered = filtered.filter(msg => 
+          msg.subject.toLowerCase().includes(term) ||
+          msg.from.toLowerCase().includes(term) ||
+          msg.snippet.toLowerCase().includes(term)
+        )
+      }
 
-    // Sort messages by date (most recent first)
-    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+      // Sort messages by date (most recent first)
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    return filtered;
+      // Limit to 20 emails for all categories
+      return filtered.slice(0, 20);
+    });
   };
 
   const FilterButton = ({ type, icon: Icon, label }) => {
@@ -717,14 +760,14 @@ function App() {
         onClick={() => {
           setMessageFilter(type)
         }}
-        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-colors ${
-          messageFilter === type
-            ? isDarkMode 
-              ? 'bg-gmail-blue text-white font-medium'
-              : 'bg-gmail-blue text-white font-medium'
+        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-all duration-200 backdrop-blur-md border shadow-lg hover:shadow-xl ${
+                      messageFilter === type
+              ? isDarkMode 
+                ? 'bg-gmail-blue/30 hover:bg-gmail-blue/70 text-white font-medium border-white/40'
+                : 'bg-gmail-blue/30 hover:bg-gmail-blue/70 text-white font-medium border-white/40'
             : isDarkMode
-              ? 'text-gray-400 hover:bg-gray-700'
-              : 'text-gmail-gray hover:bg-gmail-blue/10'
+              ? 'text-gray-400 hover:bg-gray-700/80 bg-gray-800/40 border-gray-600/70 hover:border-gray-500/90'
+              : 'text-gmail-gray hover:bg-white/60 bg-white/30 border-gray-300/30 hover:border-gray-400/50'
         }`}
       >
         <Icon className={`h-4 w-4 ${
@@ -739,6 +782,71 @@ function App() {
     const newDarkMode = !isDarkMode
     setIsDarkMode(newDarkMode)
     await chrome.storage.local.set({ isDarkMode: newDarkMode })
+  }
+
+  // Add this new function for expanded Gmail search
+  const performGmailSearch = async (query, accountEmail = 'all') => {
+    try {
+      const accountsToSearch = accountEmail === 'all' ? accounts : accounts.filter(acc => acc.email === accountEmail)
+      const searchResults = []
+      
+      for (const account of accountsToSearch) {
+        try {
+          // Use Gmail API to search with the query
+          const response = await fetch(
+            `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=100&q=${encodeURIComponent(query)}`,
+            {
+              headers: {
+                Authorization: `Bearer ${account.accessToken}`,
+              },
+            }
+          )
+          
+          if (!response.ok) continue
+          
+          const data = await response.json()
+          if (!data.messages) continue
+          
+          // Fetch details for found messages
+          const messagePromises = data.messages.slice(0, 50).map(async (msg) => {
+            const msgResponse = await fetch(
+              `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${account.accessToken}`,
+                },
+              }
+            )
+            
+            if (!msgResponse.ok) return null
+            
+            const msgData = await msgResponse.json()
+            const headers = msgData.payload.headers
+            
+            return {
+              id: msg.id,
+              subject: headers.find(h => h.name === 'Subject')?.value || '(No Subject)',
+              from: headers.find(h => h.name === 'From')?.value || 'Unknown',
+              date: headers.find(h => h.name === 'Date')?.value || new Date().toISOString(),
+              snippet: msgData.snippet || '',
+              accountEmail: account.email
+            }
+          })
+          
+          const messages = await Promise.all(messagePromises)
+          searchResults.push(...messages.filter(msg => msg !== null))
+          
+        } catch (error) {
+          console.error(`Search failed for account ${account.email}:`, error)
+        }
+      }
+      
+      return searchResults.sort((a, b) => new Date(b.date) - new Date(a.date))
+      
+    } catch (error) {
+      console.error('Gmail search failed:', error)
+      throw error
+    }
   }
 
   if (initializing) {
@@ -784,6 +892,20 @@ function App() {
           }`}>
             FUSION MAIL
           </div>
+          {/* Shimmer Chat Button */}
+          <ShimmerButton
+            onClick={() => setCurrentPage('chat')}
+            className="ml-3 px-3 py-1.5 text-sm text-white"
+            shimmerColor={isDarkMode ? "#ffffff" : "#ffffff"}
+            textColor="#ffffff"
+            borderRadius="100px"
+            shimmerDuration="1s"
+            background="rgba(20, 20, 150, 1)"
+            
+          >
+            {/* <ChatBubbleLeftRightIcon className="h-4 w-4 mr-1 text-white" /> */}
+            <p className='text-white doto-title'>Fusion AI</p>
+          </ShimmerButton>
         </div>
         <div className={`flex items-center gap-2`}>
           <button 
@@ -798,17 +920,7 @@ function App() {
           >
             <ArrowPathIcon className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
           </button>
-          {/* <button
-            onClick={toggleDarkMode}
-            className="p-2 rounded-full transition-colors text-white hover:bg-white/10"
-            aria-label={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          >
-            {isDarkMode ? (
-              <SunIcon className="h-5 w-5" />
-            ) : (
-              <MoonIcon className="h-5 w-5" />
-            )}
-          </button> */}
+          
           <button 
             onClick={handleAddAccount}
             className="p-2 rounded-full transition-colors text-white hover:bg-white/10"
@@ -826,15 +938,18 @@ function App() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-scroll backdrop-blur-md bg-black/5">
-        {currentPage === 'main' && (
+      <div className="flex-1 overflow-hidden backdrop-blur-md bg-black/5 relative">
+        {/* Main Page */}
+        <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
+          currentPage === 'main' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        } overflow-y-scroll scroll-smooth`}>
           <div className={`p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
             {error && (
-              <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center justify-between">
+              <div className="mb-4 p-3 backdrop-blur-md bg-red-500/20 border border-red-400/40 text-red-100 rounded-lg text-sm flex items-center justify-between shadow-lg">
                 <span className="font-medium">{error}</span>
                 <button 
                   onClick={() => setError(null)} 
-                  className="text-red-500 hover:text-red-700 font-medium"
+                  className="text-red-200 hover:text-red-100 font-medium transition-colors"
                 >
                   Dismiss
                 </button>
@@ -842,6 +957,9 @@ function App() {
             )}
             
             <div className="flex flex-col gap-4">
+              {/* OTP Indicator */}
+              <OTPIndicator isDarkMode={isDarkMode} />
+              
               {/* Filter buttons and search */}
               <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-1.5">
@@ -855,10 +973,10 @@ function App() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search emails..."
-                    className={`pl-9 pr-3 py-1.5 rounded-full text-sm transition-colors w-[200px] focus:outline-none ${
+                    className={`pl-9 pr-3 py-1.5 rounded-full text-sm transition-all duration-200 backdrop-blur-md border shadow-lg hover:shadow-xl focus:shadow-xl w-[200px] focus:outline-none ${
                       isDarkMode
-                        ? 'bg-gray-800/50 text-gray-200 placeholder-gray-400 focus:bg-gray-800'
-                        : 'bg-white/50 text-gray-800 placeholder-gray-500 focus:bg-white'
+                        ? 'bg-gray-800/40 hover:bg-gray-800/50 focus:bg-gray-800/60 text-gray-200 placeholder-gray-400 border-white/50'
+                        : 'bg-white/40 hover:bg-white/50 focus:bg-white/60 text-gray-800 placeholder-gray-500 border-white/50'
                     }`}
                   />
                   <MagnifyingGlassIcon className="absolute left-3 w-4 h-4 text-white" />
@@ -900,9 +1018,12 @@ function App() {
               )}
             </div>
           </div>
-        )}
-        
-        {currentPage === 'settings' && (
+        </div>
+
+        {/* Settings Page */}
+        <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
+          currentPage === 'settings' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        } overflow-y-scroll scroll-smooth`}>
           <SettingsPage 
             accounts={accounts} 
             onAddAccount={handleAddAccount} 
@@ -910,11 +1031,48 @@ function App() {
             onBack={() => setCurrentPage('main')}
             isDarkMode={isDarkMode}
           />
-        )}
+        </div>
 
-        {currentPage === 'avatar' && (
+        {/* Avatar Page */}
+        <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
+          currentPage === 'avatar' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        } overflow-y-scroll scroll-smooth`}>
           <AvatarPage onBack={() => setCurrentPage('main')} isDarkMode={isDarkMode} />
-        )}
+        </div>
+
+        {/* Enhanced Chat Page with Full Extension Access */}
+        <div className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
+          currentPage === 'chat' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}>
+          <ChatPage 
+            onBack={() => setCurrentPage('main')}
+            isDarkMode={isDarkMode}
+            messages={sortedMessages()}
+            accounts={accounts}
+            currentAccount={selectedAccount}
+            currentFilter={messageFilter}
+            onAccountChange={(account) => {
+              setSelectedAccount(account)
+              if (account !== 'all') {
+                loadMessages(accounts.filter(acc => acc.email === account), messageFilter)
+              }
+            }}
+            onFilterChange={(filter) => {
+              setMessageFilter(filter)
+            }}
+            onRefresh={refreshMessages}
+            onSearch={(query) => {
+              setSearchTerm(query)
+              setCurrentPage('main')
+            }}
+            onPerformGmailSearch={performGmailSearch}
+            onArchive={handleArchive}
+            onToggleRead={handleToggleRead}
+            onToggleStar={handleToggleStar}
+            emailSummaries={new Map()}
+            loadingSummaries={new Set()}
+          />
+        </div>
       </div>
     </div>
   )

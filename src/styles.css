@@ -71,4 +71,105 @@ html, body, #root {
   font-style: normal;
   font-variation-settings: "ROND" 0;
   letter-spacing: -0.03em;
+}
+
+/* Enhanced marquee animation for AI summaries */
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 10s linear infinite;
+  animation-delay: 0.5s; /* Short delay after fade-in completes */
+}
+
+/* Pause animation on hover for better readability */
+.group:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* Smooth fade-in animation */
+.fade-in-summary {
+  animation: fadeInSummary 0.7s ease-out forwards;
+}
+
+@keyframes fadeInSummary {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced transitions */
+.animate-marquee {
+  transition: animation-play-state 0.3s ease;
+}
+
+/* Alternative: Only animate if text is longer than container */
+.animate-marquee-conditional {
+  animation: marquee 8s linear infinite;
+  animation-delay: 1s;
+  animation-play-state: paused;
+}
+
+/* Activate animation only when text overflows */
+.text-overflow .animate-marquee-conditional {
+  animation-play-state: running;
+}
+
+/* Shimmer Button Animations */
+@keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+  }
+}
+
+@keyframes spin-around {
+  0% {
+    transform: translateZ(0) rotate(0);
+  }
+  15%,
+  35% {
+    transform: translateZ(0) rotate(90deg);
+  }
+  65%,
+  85% {
+    transform: translateZ(0) rotate(270deg);
+  }
+  100% {
+    transform: translateZ(0) rotate(360deg);
+  }
+}
+
+/* Shimmer Button Animations */
+@keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+  }
+}
+
+@keyframes spin-around {
+  0% {
+    transform: translateZ(0) rotate(0);
+  }
+  15%,
+  35% {
+    transform: translateZ(0) rotate(90deg);
+  }
+  65%,
+  85% {
+    transform: translateZ(0) rotate(270deg);
+  }
+  100% {
+    transform: translateZ(0) rotate(360deg);
+  }
 } 

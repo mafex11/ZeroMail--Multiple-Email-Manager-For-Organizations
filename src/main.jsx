@@ -19,12 +19,12 @@ if (isDevelopment && !window.chrome) {
       }
     },
     identity: {
-      getRedirectURL: () => 'https://nmgohjeebbjdpackknbamacpelkkbmcc.chromiumapp.org/',
+      getRedirectURL: () => 'https://nfjapmmpjppfkhcbcoomnigcdnmpihkl.chromiumapp.org/',
       launchWebAuthFlow: (options) => {
         console.log('Would launch auth flow with URL:', options.url)
         // In dev mode, simulate a successful auth response
         const mockToken = 'dev_mock_token_' + Date.now()
-        const mockRedirectUrl = 'https://nmgohjeebbjdpackknbamacpelkkbmcc.chromiumapp.org/#access_token=' + mockToken
+        const mockRedirectUrl = 'https://nfjapmmpjppfkhcbcoomnigcdnmpihkl.chromiumapp.org/#access_token=' + mockToken
         return Promise.resolve(mockRedirectUrl)
       }
     }

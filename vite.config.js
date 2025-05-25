@@ -1,10 +1,25 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
+import { copyFileSync } from 'fs'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'copy-content-script',
+      writeBundle() {
+        // Copy content script to dist folder
+        try {
+          copyFileSync('public/content-script.js', 'dist/content-script.js')
+          console.log('Content script copied to dist/')
+        } catch (error) {
+          console.warn('Could not copy content script:', error.message)
+        }
+      }
+    }
+  ],
   build: {
     outDir: 'dist',
     rollupOptions: {
