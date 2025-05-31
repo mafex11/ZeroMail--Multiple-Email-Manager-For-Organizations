@@ -1,0 +1,11 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
+  "/api/subscription/create-order/route": "/api/subscription/create-order",
+  "/api/subscription/verify-payment/route": "/api/subscription/verify-payment",
+  "/api/user/profile/route": "/api/user/profile",
+  "/favicon.ico/route": "/favicon.ico",
+  "/dashboard/page": "/dashboard",
+  "/page": "/",
+  "/pricing/page": "/pricing"
+}
