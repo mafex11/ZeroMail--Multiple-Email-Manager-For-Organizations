@@ -1,7 +1,7 @@
 // Email Summary Service using DeepSeek API with persistent caching
 export class EmailSummaryService {
   constructor() {
-    this.apiKey = 'sk-7b936c669e244234ae536eddf9281dfa'
+    this.apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY
     this.baseUrl = 'https://api.deepseek.com/chat/completions'
     this.model = 'deepseek-chat' // Cheapest model
     this.summaryCache = new Map() // In-memory cache

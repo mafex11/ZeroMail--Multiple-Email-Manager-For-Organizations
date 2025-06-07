@@ -1,7 +1,7 @@
 // Enhanced Email Chat Service with intelligent pagination and full UI access
 export class EmailChatService {
   constructor() {
-    this.apiKey = 'sk-7b936c669e244234ae536eddf9281dfa'
+    this.apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY
     this.baseUrl = 'https://api.deepseek.com/chat/completions'
     this.model = 'deepseek-chat'
     this.chatHistory = []
