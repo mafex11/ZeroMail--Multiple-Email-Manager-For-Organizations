@@ -1,58 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createUser } from '@/lib/auth'
 import { CreateUserData } from '@/lib/models/User'
+import { hash } from 'bcryptjs'
+import clientPromise from '@/lib/mongodb'
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body: CreateUserData = await request.json()
-    
-    // Validate required fields
-    if (!body.email || !body.password || !body.firstName || !body.lastName) {
+    const { name, email, password } = await req.json()
+
+    // Validate the input
+    if (!name || !email || !password) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       )
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(body.email)) {
+    const client = await clientPromise
+    const db = client.db('fusionmail')
+    const usersCollection = db.collection('users')
+
+    // Check if user already exists
+    const existingUser = await usersCollection.findOne({ email })
+    if (existingUser) {
       return NextResponse.json(
-        { error: 'Invalid email format' },
+        { error: 'User already exists' },
         { status: 400 }
       )
     }
 
-    // Validate password strength
-    if (body.password.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters long' },
-        { status: 400 }
-      )
-    }
+    // Hash the password
+    const hashedPassword = await hash(password, 12)
 
-    // Create user
-    const user = await createUser(body)
-    
-    // Return success (without password)
-    const { password, ...userWithoutPassword } = user
-    return NextResponse.json({
-      message: 'User created successfully',
-      user: userWithoutPassword
-    }, { status: 201 })
-
-  } catch (error: any) {
-    console.error('Signup error:', error)
-    
-    if (error.message === 'User already exists') {
-      return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 409 }
-      )
-    }
+    // Create the user
+    const result = await usersCollection.insertOne({
+      name,
+      email,
+      password: hashedPassword,
+      createdAt: new Date(),
+    })
 
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        message: 'User created successfully',
+        userId: result.insertedId,
+      },
+      { status: 201 }
+    )
+  } catch (error) {
+    console.error('Registration error:', error)
+    return NextResponse.json(
+      { error: 'Something went wrong' },
       { status: 500 }
     )
   }

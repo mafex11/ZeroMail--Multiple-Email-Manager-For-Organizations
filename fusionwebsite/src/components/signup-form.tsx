@@ -3,20 +3,20 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-export function LoginForm({
+export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -28,10 +28,31 @@ export function LoginForm({
     setIsLoading(true);
 
     const formData = new FormData(event.currentTarget);
+    const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
 
     try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      // Sign in the user after successful registration
       const result = await signIn("credentials", {
         email,
         password,
@@ -42,20 +63,24 @@ export function LoginForm({
         toast.error(result.error);
       } else {
         router.push("/dashboard");
-        toast.success("Logged in successfully!");
+        toast.success("Account created successfully!");
       }
     } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
   }
 
-  const handleSocialLogin = async (provider: string) => {
+  const handleSocialSignUp = async (provider: string) => {
     try {
       await signIn(provider, { callbackUrl: "/dashboard" });
     } catch (error) {
-      toast.error("Failed to login with " + provider);
+      toast.error("Failed to sign up with " + provider);
     }
   };
 
@@ -63,9 +88,9 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardTitle className="text-xl">Create an account</CardTitle>
           <CardDescription>
-            Login with your Apple or Google account
+            Sign up with your Apple or Google account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -76,7 +101,7 @@ export function LoginForm({
                   type="button"
                   variant="outline"
                   className="w-full"
-                  onClick={() => handleSocialLogin("apple")}
+                  onClick={() => handleSocialSignUp("apple")}
                   disabled={isLoading}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -85,13 +110,13 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Apple
+                  Sign up with Apple
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   className="w-full"
-                  onClick={() => handleSocialLogin("google")}
+                  onClick={() => handleSocialSignUp("google")}
                   disabled={isLoading}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -100,7 +125,7 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Google
+                  Sign up with Google
                 </Button>
               </div>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -109,6 +134,17 @@ export function LoginForm({
                 </span>
               </div>
               <div className="grid gap-6">
+                <div className="grid gap-3">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    placeholder="John Doe"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
                 <div className="grid gap-3">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -121,15 +157,7 @@ export function LoginForm({
                   />
                 </div>
                 <div className="grid gap-3">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
-                    <a
-                      href="#"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot your password?
-                    </a>
-                  </div>
+                  <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
                     name="password"
@@ -138,14 +166,24 @@ export function LoginForm({
                     disabled={isLoading}
                   />
                 </div>
+                <div className="grid gap-3">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : "Login"}
+                  {isLoading ? "Creating account..." : "Create account"}
                 </Button>
               </div>
               <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <a href="/signup" className="underline underline-offset-4">
-                  Sign up
+                Already have an account?{" "}
+                <a href="/login" className="underline underline-offset-4">
+                  Log in
                 </a>
               </div>
             </div>
@@ -157,5 +195,5 @@ export function LoginForm({
         and <a href="#">Privacy Policy</a>.
       </div>
     </div>
-  )
-}
+  );
+} 

@@ -82,7 +82,7 @@ const Icons = {
 const DATA = {
   navbar: [
     { href: "#", icon: HomeIcon, label: "Home" },
-    { href: "#", icon: VscVscodeInsiders  , label: "Blog" },
+    { href: "#", icon: VscVscodeInsiders  , label: "Extension" },
   ],
   contact: {
     social: {

@@ -1,12 +1,13 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { MailIcon } from "lucide-react"
+import { MailIcon, GalleryVerticalEnd } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/context/AuthContext"
+import { SignUpForm } from "@/components/signup-form"
 
 function SignupForm({
   className,
@@ -214,63 +215,17 @@ function SignupForm({
   )
 }
 
-export default function SignupPage() {
+export default function SignUpPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="grid min-h-screen lg:grid-cols-2">
-        {/* Left side - Signup Form */}
-        <div className="flex flex-col gap-4 p-6 md:p-10 bg-black">
-          {/* Logo/Brand */}
-          <div className="flex justify-center gap-2 md:justify-start">
-            <a href="/" className="flex items-center gap-2 font-medium text-white hover:opacity-80 transition-opacity">
-              <div className="bg-white text-black flex size-8 items-center justify-center rounded-md">
-                <MailIcon className="size-5" />
-              </div>
-              <span className="text-xl font-bold doto-navbar">Fusion Mail</span>
-            </a>
+    <div className="bg-black text-white flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <a href="/" className="flex items-center gap-2 self-center font-medium">
+          <div className="bg-white text-black flex size-6 items-center justify-center rounded-md">
+            <GalleryVerticalEnd className="size-4" />
           </div>
-          
-          {/* Form Container */}
-          <div className="flex flex-1 items-center justify-center">
-            <div className="w-full max-w-sm">
-              <SignupForm />
-            </div>
-          </div>
-        </div>
-
-        {/* Right side - Features */}
-        <div className="hidden lg:flex bg-gray-900 relative">
-          <div className="flex flex-col justify-center items-center p-12 text-center">
-            <div className="max-w-md">
-              <h2 className="text-4xl font-bold mb-6 doto-navbar">
-                Join the Revolution
-              </h2>
-              <p className="text-gray-300 text-lg mb-8 leading-relaxed">
-                Transform your email workflow with AI-powered features designed for modern productivity.
-              </p>
-              
-              {/* Benefits */}
-              <div className="space-y-4 text-left">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-gray-300">Start with a free account</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-gray-300">No credit card required</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-gray-300">Upgrade anytime</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <span className="text-gray-300">Cancel anytime</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          Fusion Mail
+        </a>
+        <SignUpForm />
       </div>
     </div>
   )
