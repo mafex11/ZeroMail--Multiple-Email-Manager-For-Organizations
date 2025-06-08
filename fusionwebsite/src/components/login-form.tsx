@@ -41,8 +41,8 @@ export function LoginForm({
       if (result?.error) {
         toast.error(result.error);
       } else {
-        router.push("/dashboard");
-        toast.success("Logged in successfully!");
+        router.push("/");
+        // toast.success("Logged in successfully!");
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
@@ -53,7 +53,7 @@ export function LoginForm({
 
   const handleSocialLogin = async (provider: string) => {
     try {
-      await signIn(provider, { callbackUrl: "/dashboard" });
+      await signIn(provider, { callbackUrl: "/" });
     } catch (error) {
       toast.error("Failed to login with " + provider);
     }

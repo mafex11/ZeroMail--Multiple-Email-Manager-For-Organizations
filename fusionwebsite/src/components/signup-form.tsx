@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { validatePassword } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,10 +23,12 @@ export function SignUpForm({
 }: React.ComponentProps<"div">) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
+    setPasswordErrors([]);
 
     const formData = new FormData(event.currentTarget);
     const name = formData.get("name") as string;
@@ -35,6 +38,14 @@ export function SignUpForm({
 
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate password
+    const validation = validatePassword(password);
+    if (!validation.isValid) {
+      setPasswordErrors(validation.errors);
       setIsLoading(false);
       return;
     }
@@ -52,7 +63,7 @@ export function SignUpForm({
         throw new Error(data.error || "Something went wrong");
       }
 
-      // Sign in the user after successful registration
+      // Sign in the user after successful registration using NextAuth
       const result = await signIn("credentials", {
         email,
         password,
@@ -62,8 +73,8 @@ export function SignUpForm({
       if (result?.error) {
         toast.error(result.error);
       } else {
-        router.push("/dashboard");
-        toast.success("Account created successfully!");
+        router.push("/");
+        // toast.success("Account created successfully!");
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -78,7 +89,7 @@ export function SignUpForm({
 
   const handleSocialSignUp = async (provider: string) => {
     try {
-      await signIn(provider, { callbackUrl: "/dashboard" });
+      await signIn(provider, { callbackUrl: "/" });
     } catch (error) {
       toast.error("Failed to sign up with " + provider);
     }
@@ -165,6 +176,15 @@ export function SignUpForm({
                     required
                     disabled={isLoading}
                   />
+                  {passwordErrors.length > 0 && (
+                    <div className="text-sm text-red-500">
+                      <ul className="list-disc pl-4">
+                        {passwordErrors.map((error, index) => (
+                          <li key={index}>{error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
                 <div className="grid gap-3">
                   <Label htmlFor="confirmPassword">Confirm Password</Label>

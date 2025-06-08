@@ -3,6 +3,7 @@ import { createUser } from '@/lib/auth'
 import { CreateUserData } from '@/lib/models/User'
 import { hash } from 'bcryptjs'
 import clientPromise from '@/lib/mongodb'
+import { validatePassword } from '@/lib/utils'
 
 export async function POST(req: Request) {
   try {
@@ -12,6 +13,15 @@ export async function POST(req: Request) {
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    // Validate password requirements
+    const validation = validatePassword(password);
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { error: validation.errors.join(', ') },
         { status: 400 }
       )
     }

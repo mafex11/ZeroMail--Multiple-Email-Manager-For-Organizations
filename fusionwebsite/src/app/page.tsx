@@ -1,10 +1,11 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 
  
-import { CalendarIcon, HomeIcon, MailIcon, PencilIcon } from "lucide-react";
-import { VscVscodeInsiders } from "react-icons/vsc";
+import { CalendarIcon, HomeIcon, MailIcon, PencilIcon, User, Settings, CreditCard, LogOut } from "lucide-react";
+import { BsDownload } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
@@ -15,6 +16,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Dock, DockIcon } from "@/components/magicui/dock";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
@@ -32,6 +41,7 @@ import {
 import * as React from "react"
 
 import { CircleCheckIcon, CircleHelpIcon, CircleIcon } from "lucide-react"
+import Features from "@/components/Features";
  
 export type IconProps = React.HTMLAttributes<SVGElement>;
 
@@ -82,7 +92,7 @@ const Icons = {
 const DATA = {
   navbar: [
     { href: "#", icon: HomeIcon, label: "Home" },
-    { href: "#", icon: VscVscodeInsiders  , label: "Extension" },
+    { href: "#", icon: BsDownload   , label: "Download" },
   ],
   contact: {
     social: {
@@ -151,9 +161,15 @@ function FadeInImage({ src, alt, width, height, className, delay = 0 }: {
 }
 
 export default function Home() {
+  const { data: session, status } = useSession();
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/" });
+  };
+
   return (
-    <div className=" bg-black grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-        <NavigationMenu className="dark text-white" viewport={false}>
+    <div className="bg-zinc-900 grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] overflow-x-hidden">
+        <NavigationMenu className="dark bg-zinc-950 px-4 py-2 rounded-md text-white relative z-50 w-auto" viewport={false} orientation="horizontal">
                 
               <NavigationMenuList>
 
@@ -241,17 +257,64 @@ export default function Home() {
                   <Link href="/try">Try Now</Link>
                 </NavigationMenuLink>
                   </NavigationMenuItem>
+                
                 <NavigationMenuItem>
-                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                  <Link href="/login">Login</Link>
-                </NavigationMenuLink>
-                  </NavigationMenuItem>
+                  {status === "loading" ? (
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                      Loading...
+                    </NavigationMenuLink>
+                  ) : session ? (
+                    <div className="relative">
+                      <DropdownMenu modal={false}>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className= {navigationMenuTriggerStyle()}>
+                            <User className="mr-2 h-4 w-4 " />
+                            Account
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent 
+                          className="w-56 bg-zinc-800 border-zinc-700 text-white z-[9999]" 
+                          align="end"
+                          sideOffset={5}
+                          avoidCollisions={true}
+                          sticky="always"
+                          side="bottom"
+                          alignOffset={0}
+                        >
+                          <DropdownMenuItem asChild>
+                            <Link href="/settings" className="cursor-pointer">
+                              <Settings className="mr-2 h-4 w-4" />
+                              <span>Settings</span>
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href="/payments" className="cursor-pointer">
+                              <CreditCard className="mr-2 h-4 w-4" />
+                              <span>Payments</span>
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            <span>Log out</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  ) : (
+                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                      <Link href="/login">Login</Link>
+                    </NavigationMenuLink>
+                  )}
+                </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
       <main className="flex flex-col  row-start-2  items-center ">
 
         <span className="mt-20 pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-9xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10">
           Fusion Mail
+        </span>
+        <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-3xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10">
+          Your One Stop Solution for all your mail needs.
         </span>
           <InteractiveHoverButton className="mt-10">Try Now</InteractiveHoverButton>;
 
@@ -321,11 +384,11 @@ export default function Home() {
       </TooltipProvider>
        </div>
        
-
+       <Features/> 
       </main>
       
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        footer
+        
       </footer>
     </div>
   );

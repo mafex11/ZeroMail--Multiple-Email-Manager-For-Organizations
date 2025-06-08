@@ -119,6 +119,22 @@
   }
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+  }
+  
+  /* Prevent layout shifts from dropdowns */
+  [data-radix-popper-content-wrapper] {
+    z-index: 9999 !important;
+  }
+  
+  /* Ensure dropdowns don't affect page layout */
+  [data-state="open"] {
+    overflow: visible !important;
+  }
+  
+  /* Hide horizontal scrollbars globally */
+  html {
+    overflow-x: hidden;
   }
 }
 

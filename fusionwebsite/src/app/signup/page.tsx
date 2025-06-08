@@ -92,9 +92,7 @@ function SignupForm({
       {/* Header */}
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-3xl font-bold text-white doto-navbar">Create Account</h1>
-        <p className="text-gray-400 text-sm">
-          Join Fusion Mail and revolutionize your email experience
-        </p>
+       
       </div>
 
       {/* Error Message */}
@@ -217,7 +215,7 @@ function SignupForm({
 
 export default function SignUpPage() {
   return (
-    <div className="bg-black text-white flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <div className="bg-zinc-900 text-white flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
         <a href="/" className="flex items-center gap-2 self-center font-medium">
           <div className="bg-white text-black flex size-6 items-center justify-center rounded-md">
