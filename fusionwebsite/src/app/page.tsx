@@ -144,8 +144,8 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-zinc-900 items-center justify-items-center min-h-screen p-8 pb-20 font-[family-name:var(--font-geist-sans)] ">
-        <NavigationMenu className="dark bg-zinc-950 px-4 py-2 rounded-md text-white relative z-50 w-auto" viewport={false} orientation="horizontal">
+    <div className="bg-zinc-950 items-center justify-items-center min-h-screen p-8 pb-20 font-[family-name:var(--font-geist-sans)] ">
+        <NavigationMenu className="dark bg-zinc-900 px-4 py-2 rounded-md text-white relative z-50 w-auto" viewport={false} orientation="horizontal">
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuTrigger>Home</NavigationMenuTrigger>
@@ -359,8 +359,16 @@ export default function Home() {
        <Features/> 
       </main>
       
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        
+      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center mt-20">
+      <div className="w-full max-w-[90%] sm:max-w-4xl h-auto mx-auto">
+      <img 
+            src="/trynow.svg" 
+            className='w-full max-w-[90%] sm:max-w-4xl h-auto mx-auto' 
+            alt="Mail Summarizer Feature"
+          />
+          
+      </div>
+      
       </footer>
     </div>
   );
