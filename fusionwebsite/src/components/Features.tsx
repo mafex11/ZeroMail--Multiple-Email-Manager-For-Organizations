@@ -38,47 +38,33 @@ const Features = () => {
   }
 
   return (
-    <div className='flex justify-center items-center text-center mx-auto'>
-      <div className='text-white'>
-        <div className='text-bold text-center mt-30'>
-          <h1 className='doto-title text-7xl'>
+    <div className='flex justify-center items-center text-center mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'>
+      <div className='text-white w-full'>
+        <div className='text-bold text-center mt-10 sm:mt-20'>
+          <span className='doto-title text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold'>
             Mail Summarizer
-          </h1>
-          <p className='text-4xl font-thin w-full mx-auto p-10'>
+          </span>
+          <p className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-thin w-full max-w-4xl mx-auto py-2 sm:py-10 px-4'>
             Fusion generates the email summary for you to quickly go through your emails.
           </p>
-          <img src="/featsumm.svg" className=' w-4xl h-full mx-auto' />
+          <img 
+            src="/featsumm.svg" 
+            className='w-full max-w-[90%] sm:max-w-4xl h-auto mx-auto' 
+            alt="Mail Summarizer Feature"
+          />
         </div>
 
-        <div className='text-bold text-center mt-30'>
-          <h1 className='doto-title text-7xl'>
+        <div className='text-bold text-center mt-16 sm:mt-24 md:mt-30'>
+          <h1 className='doto-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold'>
             AI Email Agent
           </h1>
-          <p className='text-4xl font-thin w-full mx-auto p-10'>
+          <p className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-thin w-full max-w-4xl mx-auto py-2 sm:py-10 px-4'>
             Fusion AI is a powerful Agent that helps you to manage your emails.
           </p>
           
           {/* Image Carousel */}
-          <div className='relative w-4xl h-full overflow-hidden mx-auto'>
-            <div 
-              className='flex transition-transform duration-500 ease-in-out'
-              style={{
-                transform: `translateX(-${currentImageIndex * 100}%)`,
-                width: `${aiAgentImages.length * 100}%`
-              }}
-            >
-              {aiAgentImages.map((imageSrc, index) => (
-                <div key={index} className='w-full flex-shrink-0'>
-                  <img 
-                    src={imageSrc} 
-                    className='w-4xl h-full object-contain' 
-                    alt={`AI Agent ${index + 1}`}
-                  />
-                </div>
-              ))}
-            </div>
-            
-            {/* Left Navigation Button */}
+          <div className='relative w-full max-w-4xl h-full overflow-hidden mx-auto'>
+            {/* Navigation Buttons */}
             <Button
               onClick={prevImage}
               disabled={isTransitioning}
@@ -89,7 +75,6 @@ const Features = () => {
               <ChevronLeft className="h-4 w-4" />
             </Button>
             
-            {/* Right Navigation Button */}
             <Button
               onClick={nextImage}
               disabled={isTransitioning}
@@ -100,8 +85,29 @@ const Features = () => {
               <ChevronRight className="h-4 w-4" />
             </Button>
             
-            {/* Image Indicators - Keep below the image */}
-            <div className='flex justify-center items-center gap-2 mt-6'>
+            <div 
+              className='flex transition-transform duration-500 ease-in-out'
+              style={{
+                transform: `translateX(-${currentImageIndex * 100}%)`,
+                width: `${aiAgentImages.length * 100}%`
+              }}
+            >
+              {aiAgentImages.map((imageSrc, index) => (
+                <div key={index} className='flex-shrink-0'>
+                  <img 
+                    src={imageSrc} 
+                    className='' 
+                    alt={`AI Agent ${index + 1}`}
+                  />
+                </div>
+              ))}
+              
+            </div>
+            
+            
+            
+            {/* Image Indicators */}
+            <div className='flex justify-center items-center gap-2 mt-4 sm:mt-6'>
               {aiAgentImages.map((_, index) => (
                 <button
                   key={index}

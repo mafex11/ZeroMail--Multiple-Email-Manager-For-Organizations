@@ -2,46 +2,22 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
-
- 
 import { CalendarIcon, HomeIcon, MailIcon, PencilIcon, User, Settings, CreditCard, LogOut } from "lucide-react";
 import { BsDownload } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Dock, DockIcon } from "@/components/magicui/dock";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
-
-
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
 import * as React from "react"
-
 import { CircleCheckIcon, CircleHelpIcon, CircleIcon } from "lucide-react"
 import Features from "@/components/Features";
+
  
 export type IconProps = React.HTMLAttributes<SVGElement>;
 
@@ -168,16 +144,13 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-zinc-900 grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] overflow-x-hidden">
+    <div className="bg-zinc-900 items-center justify-items-center min-h-screen p-8 pb-20 font-[family-name:var(--font-geist-sans)] ">
         <NavigationMenu className="dark bg-zinc-950 px-4 py-2 rounded-md text-white relative z-50 w-auto" viewport={false} orientation="horizontal">
-                
-              <NavigationMenuList>
-
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>Home</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                 
-                    <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>Home</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                       <li className="row-span-3">
                         <NavigationMenuLink asChild>
                           <a
@@ -208,8 +181,8 @@ export default function Home() {
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
-        
-                <NavigationMenuItem>
+
+                <NavigationMenuItem className="hidden sm:block">
                   <NavigationMenuTrigger>Features</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-2 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
@@ -226,7 +199,7 @@ export default function Home() {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem>
+                <NavigationMenuItem className="hidden sm:block">
                   <NavigationMenuTrigger>Contact</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[200px] gap-4">
@@ -252,7 +225,7 @@ export default function Home() {
                   </NavigationMenuItem>
                 
                 
-                <NavigationMenuItem>
+                <NavigationMenuItem className="hidden sm:block">
                 <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                   <Link href="/try">Try Now</Link>
                 </NavigationMenuLink>
@@ -307,15 +280,15 @@ export default function Home() {
                   )}
                 </NavigationMenuItem>
               </NavigationMenuList>
-            </NavigationMenu>
-      <main className="flex flex-col  row-start-2  items-center ">
+        </NavigationMenu>
+      <main className="flex flex-col items-center">
 
-        <span className="mt-20 pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-9xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10">
+                 <span className="mt-20 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-6xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl px-4 w-screen"> 
           Fusion Mail
-        </span>
-        <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-3xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10">
+          </span>
+         <h1 className="mt-4 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-xl md:text-4xl w-screen mx-auto">
           Your One Stop Solution for all your mail needs.
-        </span>
+         </h1>
           <InteractiveHoverButton className="mt-10">Try Now</InteractiveHoverButton>;
 
        {/* Fade-in Images */}
@@ -324,16 +297,15 @@ export default function Home() {
          alt="Fusion" 
          width={2000} 
          height={2000} 
-         className="hidden md:block" 
+         className="hidden lg:block" 
        />
        <FadeInImage 
          src="/mobbg.svg" 
          alt="Fusion" 
          width={1000} 
-         height={1000} 
-         className="md:hidden block" 
+         height={500} 
+         className="block lg:hidden w-screen" 
        />
-       
        <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50">
        <TooltipProvider>
         <Dock direction="middle">
