@@ -141,6 +141,27 @@ function FadeInImage({ src, alt, width, height, className, delay = 0 }: {
   );
 }
 
+// ListItem component for navigation
+function ListItem({
+  title,
+  children,
+  href,
+  ...props
+}: React.ComponentPropsWithoutRef<"li"> & { href: string }) {
+  return (
+    <li {...props}>
+      <NavigationMenuLink asChild>
+        <Link href={href}>
+          <div className="text-sm leading-none font-medium">{title}</div>
+          <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
+            {children}
+          </p>
+        </Link>
+      </NavigationMenuLink>
+    </li>
+  )
+}
+
 // Mobile Features Bento Box
 function MobileFeaturesBento() {
   const features = [
@@ -222,7 +243,8 @@ export default function Home() {
 
   return (
     <div className="bg-zinc-950 items-center justify-items-center min-h-screen p-8 pb-20 font-[family-name:var(--font-geist-sans)] ">
-        <NavigationMenu className="dark bg-zinc-900 px-4 py-2 rounded-md text-white relative z-50 w-auto items-center justify-center" viewport={false} orientation="horizontal">
+        <div className="flex justify-center w-full">
+          <NavigationMenu className="dark bg-zinc-900 px-4 py-2 rounded-md text-white relative z-50 w-auto" viewport={false} orientation="horizontal">
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuTrigger>Home</NavigationMenuTrigger>
@@ -357,7 +379,8 @@ export default function Home() {
                   )}
                 </NavigationMenuItem>
               </NavigationMenuList>
-        </NavigationMenu>
+          </NavigationMenu>
+        </div>
       <main className="flex flex-col items-center">
 
           <span className="mt-20 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-6xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl px-4 w-screen"> 
@@ -453,25 +476,4 @@ export default function Home() {
       </footer>
     </div>
   );
-}
-
-
-function ListItem({
-  title,
-  children,
-  href,
-  ...props
-}: React.ComponentPropsWithoutRef<"li"> & { href: string }) {
-  return (
-    <li {...props}>
-      <NavigationMenuLink asChild>
-        <Link href={href}>
-          <div className="text-sm leading-none font-medium">{title}</div>
-          <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
-            {children}
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  )
 }
