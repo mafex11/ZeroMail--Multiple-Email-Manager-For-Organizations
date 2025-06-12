@@ -38,51 +38,37 @@ const Features = () => {
   }
 
   return (
-    <div className='flex justify-center items-center text-center mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'>
-      <div className='text-white w-full'>
-        <div className='text-bold text-center mt-10 sm:mt-20'>
-          <span className='doto-title text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold'>
+    <div className='flex justify-center items-center text-center mx-auto'>
+      <div className='text-white'>
+        <div className='mt-10 px-6'>
+          <span className='doto-title text-3xl sm:text-3xl md:text-5xl lg:text-7xl font-bold'>
             Mail Summarizer
           </span>
-          <p className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-thin w-full max-w-4xl mx-auto py-2 sm:py-10 px-4'>
+          <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 '>
             Fusion generates the email summary for you to quickly go through your emails.
           </p>
-          <img 
-            src="/featsumm.svg" 
-            className='w-full max-w-[90%] sm:max-w-4xl h-auto mx-auto' 
-            alt="Mail Summarizer Feature"
-          />
+          <img src="/featsumm.svg" className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
         </div>
 
-        <div className='text-bold text-center mt-10 sm:mt-20'>
-          <span className='doto-title text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold'>
+        <div className='mt-10 px-6'>
+          <span className='doto-title text-3xl sm:text-3xl md:text-5xl lg:text-7xl font-bold'>
           AI Email Agent
           </span>
-          <p className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-thin w-full max-w-4xl mx-auto py-2 sm:py-10 px-4'>
-          Fusion AI is a powerful Agent that helps you to manage your emails.          </p>
-          <img 
-            src="/aiagent1.svg" 
-            className='w-full max-w-[90%] sm:max-w-4xl h-auto mx-auto' 
-            alt="Mail Summarizer Feature"
-          />
+          <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 '>
+          Fusion AI is a powerful Agent that helps you to manage your emails.
+          </p>
+          <img src="/featagent.svg" className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
         </div>
 
-        <div className='text-bold text-center mt-10 sm:mt-20'>
-          <span className='doto-title text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold'>
+        <div className='mt-10 px-6'>
+          <span className='doto-title text-3xl sm:text-3xl md:text-5xl lg:text-7xl font-bold'>
           Autofill OTP
           </span>
-          <p className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-thin w-full max-w-4xl mx-auto py-2 sm:py-10 px-4'>
-          Fusion mail extension detects the OTP and automatically fills it for you.          </p>
-          <img 
-            src="/otp.svg" 
-            className='w-full max-w-[90%] sm:max-w-4xl h-auto mx-auto' 
-            alt="Mail Summarizer Feature"
-          />
+          <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 '>
+          Fusion mail extension detects the OTP and automatically fills it for you.
+          </p>
+          <img src="/featotp.svg"  className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
         </div>
-
-         
-          
-      
       </div>
     </div> 
   )

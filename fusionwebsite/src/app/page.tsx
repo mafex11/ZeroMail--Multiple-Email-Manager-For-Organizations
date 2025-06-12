@@ -128,9 +128,14 @@ function FadeInImage({ src, alt, width, height, className, delay = 0 }: {
         className={`transition-all duration-1000 ease-in-out ${
           isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}
-        style={{ transitionDelay: `${delay}ms` }}
+        style={{ 
+          transitionDelay: `${delay}ms`,
+          maxWidth: '100%',
+          height: 'auto'
+        }}
         onLoad={() => setTimeout(() => setIsLoaded(true), delay)}
         priority
+        quality={100}
       />
     </div>
   );
@@ -302,9 +307,9 @@ export default function Home() {
        <FadeInImage 
          src="/mobbg.svg" 
          alt="Fusion" 
-         width={1000} 
-         height={500} 
-         className="block lg:hidden w-screen" 
+         width={800} 
+         height={600} 
+         className="block lg:hidden w-full max-w-screen-sm mx-auto" 
        />
        <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50">
        <TooltipProvider>
@@ -355,8 +360,7 @@ export default function Home() {
         </Dock>
       </TooltipProvider>
        </div>
-       
-       <Features/> 
+       <Features/>
       </main>
       
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center mt-20">
@@ -364,7 +368,6 @@ export default function Home() {
       <img 
             src="/trynow.svg" 
             className='w-full max-w-[90%] sm:max-w-4xl h-auto mx-auto' 
-            alt="Mail Summarizer Feature"
           />
           
       </div>
