@@ -393,14 +393,14 @@ export default function Home() {
 
        {/* Fade-in Images - Hidden on mobile */}
        <FadeInImage 
-         src="/mainhero.svg" 
+         src="/mainhero.png" 
          alt="Fusion" 
          width={2000} 
          height={2000} 
          className="hidden lg:block" 
        />
        <FadeInImage 
-         src="/mobbg.svg" 
+         src="/mobbg.png" 
          alt="Fusion" 
          width={800} 
          height={600} 
