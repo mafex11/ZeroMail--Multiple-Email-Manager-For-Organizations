@@ -47,7 +47,7 @@ const Features = () => {
           <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 '>
             Fusion generates the email summary for you to quickly go through your emails.
           </p>
-          <img src="/featsumm.svg" className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
+          <img src="/featsumm.png" className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
         </div>
 
         <div className='mt-10 px-6'>
@@ -57,7 +57,7 @@ const Features = () => {
           <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 '>
           Fusion AI is a powerful Agent that helps you to manage your emails.
           </p>
-          <img src="/featagent.svg" className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
+          <img src="/featagent.png" className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
         </div>
 
         <div className='mt-10 px-6'>
@@ -67,7 +67,7 @@ const Features = () => {
           <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 '>
           Fusion mail extension detects the OTP and automatically fills it for you.
           </p>
-          <img src="/featotp.svg"  className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
+          <img src="/featotp.png"  className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
         </div>
       </div>
     </div> 

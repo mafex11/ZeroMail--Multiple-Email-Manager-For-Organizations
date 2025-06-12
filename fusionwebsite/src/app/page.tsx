@@ -162,77 +162,7 @@ function ListItem({
   )
 }
 
-// Mobile Features Bento Box
-function MobileFeaturesBento() {
-  const features = [
-    {
-      title: "AI Email Summarizer",
-      description: "Get quick summaries of your emails to save time and stay organized.",
-      icon: <MessageSquare className="h-6 w-6 text-white" />,
-    },
-    {
-      title: "Auto OTP Detection", 
-      description: "Automatically detect and copy OTPs from your emails to clipboard.",
-      icon: <Shield className="h-6 w-6 text-white" />,
-    },
-    {
-      title: "AI Email Agent",
-      description: "Powerful AI assistant to help you manage and organize your emails efficiently.", 
-      icon: <Zap className="h-6 w-6 text-white" />,
-    },
-    {
-      title: "Multiple Account Management",
-      description: "Manage all your email accounts from one unified interface seamlessly.",
-      icon: <Users className="h-6 w-6 text-white" />,
-    },
-    {
-      title: "Google, Microsoft & Apple Support",
-      description: "Full integration with Gmail, Outlook, and iCloud email services.",
-      icon: <Globe className="h-6 w-6 text-white" />,
-    },
-    {
-      title: "Email Organizer & Manager",
-      description: "Intelligent email organization with smart folders and advanced filtering.",
-      icon: <FolderOpen className="h-6 w-6 text-white" />,
-    }
-  ];
 
-  return (
-    <div className="lg:hidden px-6 mt-16 mb-8">
-      <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-8">
-        Powerful Features
-      </h2>
-      <div className="grid grid-cols-1 gap-4 max-w-md mx-auto">
-        {features.map((feature, index) => (
-          <div
-            key={index}
-            className="relative p-6 rounded-xl border border-white/20 bg-gradient-to-br from-black via-gray-900 to-black backdrop-blur-sm transition-all duration-300 hover:border-white/40 hover:scale-105 hover:shadow-xl group overflow-hidden"
-          >
-            {/* Shiny overlay effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
-            
-            {/* Subtle inner glow */}
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-50"></div>
-            
-            <div className="relative flex items-start space-x-4 z-10">
-              <div className="flex-shrink-0 p-2 rounded-lg bg-white/10 backdrop-blur-sm group-hover:bg-white/20 transition-colors duration-300">
-                {feature.icon}
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-gray-100 transition-colors duration-300">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-gray-300 leading-relaxed group-hover:text-gray-200 transition-colors duration-300">
-                  {feature.description}
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -407,9 +337,6 @@ export default function Home() {
          className="block lg:hidden" 
        />
        
-       {/* Mobile Features Bento Box */}
-       <MobileFeaturesBento />
-       
        <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50">
        <TooltipProvider>
         <Dock direction="middle">
@@ -459,9 +386,7 @@ export default function Home() {
         </Dock>
       </TooltipProvider>
        </div>
-       <div className="hidden lg:block">
-         <Features/>
-       </div>
+       <Features/>
       </main>
       
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center mt-20">
