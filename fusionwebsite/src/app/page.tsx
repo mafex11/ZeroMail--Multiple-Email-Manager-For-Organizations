@@ -386,7 +386,7 @@ export default function Home() {
           <span className="mt-20 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-6xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl px-4 w-screen"> 
           Fusion Mail
           </span>
-         <h1 className="mt-4 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-xl md:text-4xl w-screen mx-auto px-4">
+         <h1 className="mt-4 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-xl md:text-4xl w-full max-w-4xl mx-auto px-6">
           Your One Stop Solution for all your mail needs.
          </h1>
           <InteractiveHoverButton className="mt-10">Try Now</InteractiveHoverButton>;
