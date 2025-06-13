@@ -16,10 +16,11 @@ import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-b
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
 import * as React from "react"
 import { CircleCheckIcon, CircleHelpIcon, CircleIcon, Zap, MessageSquare, Shield, Users, Globe, FolderOpen } from "lucide-react"
-import Features from "@/components/Features";
 import Silk from "@/components/Silk/Silk";
 import { GrDownload  } from "react-icons/gr";
 import ContactForm from "@/components/ContactForm";
+import Features from "@/components/Features";
+import Footer from "@/components/Footer";
 
 export type IconProps = React.HTMLAttributes<SVGElement>;
 
@@ -378,73 +379,64 @@ export default function Home() {
               />
             </div>
           </div>
-                     </div>
-           
         </div>
-       <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50">
-
-       <TooltipProvider>
-        <Dock direction="middle">
-          {DATA.navbar.map((item) => (
-            <DockIcon key={item.label}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={item.href}
-                    aria-label={item.label}
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      "size-12 rounded-full",
-                    )}
-                  >
-                    <item.icon className="size-4 text-white " />
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{item.label}</p>
-                </TooltipContent>
-              </Tooltip>
-            </DockIcon>
-          ))}
-          <Separator orientation="vertical" className="h-full" />
-          {Object.entries(DATA.contact.social).map(([name, social]) => (
-            <DockIcon key={name}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={social.url}
-                    aria-label={social.name}
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      "size-12 rounded-full",
-                    )}
-                  >
-                    <social.icon className="size-4" />
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{name}</p>
-                </TooltipContent>
-              </Tooltip>
-            </DockIcon>
-          ))}
-        </Dock>
-      </TooltipProvider>
-       </div>
-       <Features/>
-       <ContactForm/>
+        </div>
+        <Features/>
+        
+        <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50">
+          <TooltipProvider>
+            <Dock direction="middle">
+              {DATA.navbar.map((item) => (
+                <DockIcon key={item.label}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                        href={item.href}
+                        aria-label={item.label}
+                        className={cn(
+                          buttonVariants({ variant: "ghost", size: "icon" }),
+                          "size-12 rounded-full",
+                        )}
+                      >
+                        <item.icon className="size-4 text-white " />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{item.label}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </DockIcon>
+              ))}
+              <Separator orientation="vertical" className="h-full" />
+              {Object.entries(DATA.contact.social).map(([name, social]) => (
+                <DockIcon key={name}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                        href={social.url}
+                        aria-label={social.name}
+                        className={cn(
+                          buttonVariants({ variant: "ghost", size: "icon" }),
+                          "size-12 rounded-full",
+                        )}
+                      >
+                        <social.icon className="size-4" />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{name}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </DockIcon>
+              ))}
+            </Dock>
+          </TooltipProvider>
+        </div>
+        
+        <ContactForm/>
       </main>
       
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center mt-20">
-      <div className="w-full max-w-[90%] sm:max-w-4xl h-auto mx-auto">
-      <img 
-            src="/trynow.svg" 
-            className='w-full max-w-[90%] sm:max-w-4xl h-auto mx-auto' 
-          />
-          
-      </div>
-      
-      </footer>
+      <Footer />
     </div>
   );
 }

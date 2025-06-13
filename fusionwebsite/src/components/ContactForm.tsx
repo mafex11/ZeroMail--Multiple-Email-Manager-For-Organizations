@@ -63,8 +63,11 @@ const ContactForm = () => {
         <h2 className="doto-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
           Get in Touch
         </h2>
+        <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
+          Have questions about Fusion Mail?  We'd love to hear from you.
+        </p>
         <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto">
-          Have questions about Fusion Mail? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+          Send us a message and we'll respond as soon as possible.
         </p>
       </div>
 

@@ -1,7 +1,8 @@
 "use client";
 
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Orbitron } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Doto } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { SessionProvider } from "next-auth/react";
@@ -17,11 +18,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Use Orbitron as a replacement for Doto (similar futuristic style)
-const doto = Orbitron({
+const doto = Doto({
   variable: "--font-doto",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
