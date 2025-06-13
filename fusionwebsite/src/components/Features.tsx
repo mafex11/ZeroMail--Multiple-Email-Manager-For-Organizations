@@ -38,36 +38,36 @@ const Features = () => {
   }
 
   return (
-    <div className='flex justify-center items-center text-center mx-auto'>
-      <div className='text-white'>
-        <div className='mt-10 px-6'>
-          <span className='doto-title text-3xl sm:text-3xl md:text-5xl lg:text-7xl font-bold'>
+    <div className='flex flex-col justify-center items-center text-center mx-auto max-w-7xl mt-20'>
+      <div className='text-white w-full'>
+        <div className='mt-10 px-6 flex flex-col items-center'>
+          <span className='doto-title text-3xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-center'>
             Mail Summarizer
           </span>
-          <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 '>
+          <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 text-center max-w-4xl mt-2'>
             Fusion generates the email summary for you to quickly go through your emails.
           </p>
-          <img src="/featsumm.png" className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
+          <img src="/featsumm.png" className='mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
         </div>
 
-        <div className='mt-10 px-6'>
-          <span className='doto-title text-3xl sm:text-3xl md:text-5xl lg:text-7xl font-bold'>
-          AI Email Agent
+        <div className='px-6 flex flex-col items-center mt-30'>
+          <span className='doto-title text-3xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-center'>
+            AI Email Agent
           </span>
-          <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 '>
-          Fusion AI is a powerful Agent that helps you to manage your emails.
+          <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 text-center max-w-4xl mt-2'>
+            Fusion AI is a powerful Agent that helps you to manage your emails.
           </p>
-          <img src="/featagent.png" className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
+          <img src="/featagent.png" className='mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
         </div>
 
-        <div className='mt-10 px-6'>
-          <span className='doto-title text-3xl sm:text-3xl md:text-5xl lg:text-7xl font-bold'>
-          Autofill OTP
+        <div className='px-6 flex flex-col items-center mt-30'>
+          <span className='doto-title text-3xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-center'>
+            Autofill OTP
           </span>
-          <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 '>
-          Fusion mail extension detects the OTP and automatically fills it for you.
+          <p className='text-xl sm:text-xl md:text-3xl lg:text-4xl font-thin mb-10 text-center max-w-4xl mt-2'>
+            Fusion mail extension detects the OTP and automatically fills it for you.
           </p>
-          <img src="/featotp.png"  className=' mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
+          <img src="/featotp.png" className='mx-auto lg:w-6xl md:w-3xl sm:w-2xl' />
         </div>
       </div>
     </div> 

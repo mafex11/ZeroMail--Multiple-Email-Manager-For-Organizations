@@ -17,8 +17,10 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import * as React from "react"
 import { CircleCheckIcon, CircleHelpIcon, CircleIcon, Zap, MessageSquare, Shield, Users, Globe, FolderOpen } from "lucide-react"
 import Features from "@/components/Features";
+import Silk from "@/components/Silk/Silk";
+import { GrDownload  } from "react-icons/gr";
+import ContactForm from "@/components/ContactForm";
 
- 
 export type IconProps = React.HTMLAttributes<SVGElement>;
 
 
@@ -104,7 +106,26 @@ const components: { title: string; href: string; description: string }[] = [
     href: "/features",
     description: "Get a summary of your emails.",
   },
-
+  {
+    title: "Multiple Account Management",
+    href: "/features",
+    description: "Manage multiple email accounts from one interface.",
+  },
+  {
+    title: "Multiple Login Support",
+    href: "/features",
+    description: "Login with Apple, Google, Microsoft and more providers.",
+  },
+  {
+    title: "AI Mail Agent",
+    href: "/features",
+    description: "Intelligent AI assistant to help manage your emails.",
+  },
+  {
+    title: "Easy Notification Popups",
+    href: "/features",
+    description: "Get instant notifications for important emails.",
+  },
 ]
 
 // Component for fading images
@@ -173,8 +194,8 @@ export default function Home() {
 
   return (
     <div className="bg-zinc-950 items-center justify-items-center min-h-screen p-8 pb-20 font-[family-name:var(--font-geist-sans)] ">
-        <div className="flex justify-center w-full">
-          <NavigationMenu className="dark bg-zinc-900 px-4 py-2 rounded-md text-white relative z-50 w-auto" viewport={false} orientation="horizontal">
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] w-full flex justify-center">
+          <NavigationMenu className="dark bg-zinc-800/30 backdrop-blur-md px-4 py-2 rounded-md text-white relative z-50 w-auto border border-zinc-700/50 shadow-lg " viewport={false} orientation="horizontal">
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuTrigger>Home</NavigationMenuTrigger>
@@ -234,10 +255,10 @@ export default function Home() {
                     <ul className="grid w-[200px] gap-4">
                       <li>
                         <NavigationMenuLink asChild>
-                          <Link href="#">Email Us</Link>
+                          <Link href="mailto:sudhanshuk1140@gmail.com">Email Us</Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link href="#">Contact Form</Link>
+                          <Link href="#contact-form" className="cursor-pointer">Contact Form</Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
                           <Link href="#">Set up a meeting</Link>
@@ -311,33 +332,57 @@ export default function Home() {
               </NavigationMenuList>
           </NavigationMenu>
         </div>
-      <main className="flex flex-col items-center">
-
-          <span className="mt-20 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-6xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl px-4 w-screen"> 
-          Fusion Mail
-          </span>
-         <h1 className="mt-4 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-xl md:text-4xl w-full max-w-4xl mx-auto px-6">
-          Your One Stop Solution for all your mail needs.
-         </h1>
-          <InteractiveHoverButton className="mt-10">Try Now</InteractiveHoverButton>;
-
-       {/* Fade-in Images - Hidden on mobile */}
-       <FadeInImage 
-         src="/mainhero.png" 
-         alt="Fusion" 
-         width={2000} 
-         height={2000} 
-         className="hidden lg:block" 
-       />
-       <FadeInImage 
-         src="/mobbg.png" 
-         alt="Fusion" 
-         width={800} 
-         height={600} 
-         className="block lg:hidden" 
-       />
-       
+      <main className="flex flex-col items-center relative mx-auto">
+                 <div className="relative flex flex-col items-center ">
+            <span className="mt-40 md:mt-48 lg:mt-60 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-6xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl px-4 w-screen"> 
+              Fusion Mail
+            </span>
+          <h1 className="mt-4 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-xl md:text-4xl w-full max-w-4xl mx-auto px-6">
+            Your One Stop Solution for all your mail needs.
+          </h1>
+          <div className='flex flex-row gap-10'>
+          {/* <InteractiveHoverButton className="mt-10">Download</InteractiveHoverButton> */}
+          <Button className="mt-10 h-10 rounded-4xl text-md w-34 " variant={"destructive"}>
+            <GrDownload  className="h-4 w-4" />
+            Download
+          </Button>
+          <InteractiveHoverButton className="mt-10">Try Now</InteractiveHoverButton>
+          </div>
+          
+                     {/* Hero Images with Silk background */}
+          <div className="px-4">
+            <div className="relative mt-10 overflow-hidden rounded-3xl  px-4 pt-4">
+             <div className="absolute inset-0 z-0">
+              <Silk
+                speed={5}
+                scale={1}
+                color="#7B7481"
+                noiseIntensity={1.5}
+                rotation={0}
+              />
+            </div>
+            <div className="relative z-10">
+              <FadeInImage 
+                src="/mainhero.png" 
+                alt="Fusion" 
+                width={2000} 
+                height={2000} 
+                className="hidden lg:block rounded-3xl" 
+              />
+              <FadeInImage 
+                src="/mobbg.png" 
+                alt="Fusion" 
+                width={800} 
+                height={600} 
+                className="block lg:hidden rounded-3xl" 
+              />
+            </div>
+          </div>
+                     </div>
+           
+        </div>
        <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50">
+
        <TooltipProvider>
         <Dock direction="middle">
           {DATA.navbar.map((item) => (
@@ -387,6 +432,7 @@ export default function Home() {
       </TooltipProvider>
        </div>
        <Features/>
+       <ContactForm/>
       </main>
       
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center mt-20">
