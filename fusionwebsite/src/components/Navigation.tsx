@@ -149,13 +149,13 @@ export default function Navigation() {
               </NavigationMenuLink>
                 </NavigationMenuItem>
               
-                <NavigationMenuItem>
+                <NavigationMenuItem className="hidden sm:block">
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                 <Link href="/about">About Us</Link>
               </NavigationMenuLink>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem>
+                <NavigationMenuItem className="hidden sm:block">
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                 <Link href="/privacy">Privacy Policy</Link>
               </NavigationMenuLink>
