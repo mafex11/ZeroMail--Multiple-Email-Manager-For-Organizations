@@ -4,9 +4,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Doto } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/context/AuthContext";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
+import Navigation from "@/components/Navigation";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,9 +42,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${doto.variable} antialiased`}
       >
         <SessionProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          <Navigation />
+          {children}
           <Toaster richColors position="top-right" />
         </SessionProvider>
       </body>

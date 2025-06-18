@@ -6,8 +6,6 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useAuth } from "@/context/AuthContext"
-import { SignUpForm } from "@/components/signup-form"
 
 function SignupForm({
   className,
@@ -24,7 +22,6 @@ function SignupForm({
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   
-  const { signup } = useAuth()
   const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,20 +44,27 @@ function SignupForm({
     }
 
     try {
-      const success = await signup({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
         password: formData.password
+        })
       })
 
-      if (success) {
+      const data = await response.json()
+
+      if (response.ok) {
         setSuccess(true)
         setTimeout(() => {
           router.push('/login')
         }, 2000)
       } else {
-        setError('Failed to create account. Please try again.')
+        setError(data.error || 'Failed to create account. Please try again.')
       }
     } catch (error) {
       setError('An error occurred. Please try again.')
@@ -223,7 +227,7 @@ export default function SignUpPage() {
           </div>
           Fusion Mail
         </a>
-        <SignUpForm />
+        <SignupForm />
       </div>
     </div>
   )

@@ -72,6 +72,11 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/about" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">
+                  About Us
+                </Link>
+              </li>
+              <li>
                 <Link href="/features" className="text-gray-400 hover:text-white transition-colors text-sm">
                   Features
                 </Link>
@@ -84,11 +89,6 @@ const Footer = () => {
               <li>
                 <Link href="#contact-form" className="text-gray-400 hover:text-white transition-colors text-sm">
                   Contact
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-gray-400 hover:text-white transition-colors text-sm">
-                  About Us
                 </Link>
               </li>
             </ul>
@@ -132,9 +132,22 @@ const Footer = () => {
         <div className="border-t border-zinc-700/50 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             
-            {/* Copyright */}
+            {/* Copyright & Quick Links */}
             <div className="text-gray-400 text-sm">
-              © 2025 Fusion Mail. All rights reserved.
+              <div className="mb-2">© 2025 Fusion Mail. All rights reserved.</div>
+              <div className="flex items-center space-x-4 text-xs">
+                <Link href="/about" className="hover:text-white transition-colors">
+                  About Us
+                </Link>
+                <span>•</span>
+                <Link href="/privacy" className="hover:text-white transition-colors">
+                  Privacy Policy
+                </Link>
+                <span>•</span>
+                <Link href="/terms" className="hover:text-white transition-colors">
+                  Terms of Service
+                </Link>
+              </div>
             </div>
 
             {/* Social Media Links */}

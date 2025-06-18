@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createUser } from '@/lib/auth'
-import { CreateUserData } from '@/lib/models/User'
-import { hash } from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 import clientPromise from '@/lib/mongodb'
-import { validatePassword } from '@/lib/utils'
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await req.json()
+    const { name, email, password } = await request.json()
 
-    // Validate the input
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -17,50 +13,60 @@ export async function POST(req: Request) {
       )
     }
 
-    // Validate password requirements
-    const validation = validatePassword(password);
-    if (!validation.isValid) {
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
       return NextResponse.json(
-        { error: validation.errors.join(', ') },
+        { error: 'Invalid email format' },
+        { status: 400 }
+      )
+    }
+
+    // Validate password strength
+    if (password.length < 6) {
+      return NextResponse.json(
+        { error: 'Password must be at least 6 characters long' },
         { status: 400 }
       )
     }
 
     const client = await clientPromise
     const db = client.db('fusionmail')
-    const usersCollection = db.collection('users')
+    const users = db.collection('users')
 
     // Check if user already exists
-    const existingUser = await usersCollection.findOne({ email })
+    const existingUser = await users.findOne({ email })
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User already exists' },
-        { status: 400 }
+        { error: 'User already exists with this email' },
+        { status: 409 }
       )
     }
 
-    // Hash the password
-    const hashedPassword = await hash(password, 12)
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12)
 
-    // Create the user
-    const result = await usersCollection.insertOne({
+    // Create user
+    const result = await users.insertOne({
       name,
       email,
       password: hashedPassword,
       createdAt: new Date(),
+      updatedAt: new Date()
     })
 
     return NextResponse.json(
       {
         message: 'User created successfully',
-        userId: result.insertedId,
+        userId: result.insertedId
       },
       { status: 201 }
     )
+
   } catch (error) {
-    console.error('Registration error:', error)
+    console.error('Signup error:', error)
     return NextResponse.json(
-      { error: 'Something went wrong' },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }

@@ -1,13 +1,22 @@
-import { MongoClient, Db } from 'mongodb'
+import { MongoClient } from 'mongodb'
 
 if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your MongoDB URI to .env.local')
+  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
 }
 
-const uri: string = process.env.MONGODB_URI
-const options = {}
+const uri = process.env.MONGODB_URI
+const options = {
+  serverSelectionTimeoutMS: 5000,
+  connectTimeoutMS: 10000,
+  maxPoolSize: 10,
+  serverApi: {
+    version: '1' as const,
+    strict: true,
+    deprecationErrors: true,
+  }
+}
 
-let client: MongoClient
+let client
 let clientPromise: Promise<MongoClient>
 
 if (process.env.NODE_ENV === 'development') {
@@ -28,9 +37,11 @@ if (process.env.NODE_ENV === 'development') {
   clientPromise = client.connect()
 }
 
+// Export a module-scoped MongoClient promise. By doing this in a
+// separate module, the client can be shared across functions.
 export default clientPromise
 
-export async function getDatabase(): Promise<Db> {
+export async function getDatabase() {
   const client = await clientPromise
   return client.db('fusionmail')
 }

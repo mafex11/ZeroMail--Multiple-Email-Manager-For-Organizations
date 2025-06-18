@@ -1,19 +1,16 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import { useSession, signOut } from "next-auth/react";
-import { CalendarIcon, HomeIcon, MailIcon, PencilIcon, User, Settings, CreditCard, LogOut } from "lucide-react";
+import { HomeIcon } from "lucide-react";
 import { BsDownload } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Dock, DockIcon } from "@/components/magicui/dock";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
 import * as React from "react"
 import { CircleCheckIcon, CircleHelpIcon, CircleIcon, Zap, MessageSquare, Shield, Users, Globe, FolderOpen } from "lucide-react"
 import Silk from "@/components/Silk/Silk";
@@ -21,6 +18,7 @@ import { GrDownload  } from "react-icons/gr";
 import ContactForm from "@/components/ContactForm";
 import Features from "@/components/Features";
 import Footer from "@/components/Footer";
+import FAQ from "@/components/FAQ";
 
 export type IconProps = React.HTMLAttributes<SVGElement>;
 
@@ -95,39 +93,7 @@ const DATA = {
   },
 };
 
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "Automatic OTP Detection",
-    href: "/features",
-    description:
-      "Detect & Copy OTPs To Clipboard Automatically.",
-  },
-  {
-    title: "Quick Mail Summary",
-    href: "/features",
-    description: "Get a summary of your emails.",
-  },
-  {
-    title: "Multiple Account Management",
-    href: "/features",
-    description: "Manage multiple email accounts from one interface.",
-  },
-  {
-    title: "Multiple Login Support",
-    href: "/features",
-    description: "Login with Apple, Google, Microsoft and more providers.",
-  },
-  {
-    title: "AI Mail Agent",
-    href: "/features",
-    description: "Intelligent AI assistant to help manage your emails.",
-  },
-  {
-    title: "Easy Notification Popups",
-    href: "/features",
-    description: "Get instant notifications for important emails.",
-  },
-]
+
 
 // Component for fading images
 function FadeInImage({ src, alt, width, height, className, delay = 0 }: {
@@ -163,176 +129,15 @@ function FadeInImage({ src, alt, width, height, className, delay = 0 }: {
   );
 }
 
-// ListItem component for navigation
-function ListItem({
-  title,
-  children,
-  href,
-  ...props
-}: React.ComponentPropsWithoutRef<"li"> & { href: string }) {
-  return (
-    <li {...props}>
-      <NavigationMenuLink asChild>
-        <Link href={href}>
-          <div className="text-sm leading-none font-medium">{title}</div>
-          <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
-            {children}
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  )
-}
+
 
 
 
 export default function Home() {
-  const { data: session, status } = useSession();
-
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: "/" });
-  };
 
   return (
     <div className="bg-zinc-950 items-center justify-items-center min-h-screen p-8 pb-20 font-[family-name:var(--font-geist-sans)] ">
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] w-full flex justify-center">
-          <NavigationMenu className="dark bg-zinc-800/30 backdrop-blur-md px-4 py-2 rounded-md text-white relative z-50 w-auto border border-zinc-700/50 shadow-lg " viewport={false} orientation="horizontal">
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Home</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                      <li className="row-span-3">
-                        <NavigationMenuLink asChild>
-                          <a
-                            className="from-muted/50 to-muted flex h-full w-full flex-col justify-end rounded-md bg-linear-to-b p-6 no-underline outline-hidden select-none focus:shadow-md" 
-                            
-                            href="/"
-                          >
-                          
-                            <div className="mt-4 mb-2 text-lg font-medium">
-                              Fusion Mail
-                              
-                            </div>
-                            <p className="text-muted-foreground text-sm leading-tight">
-                             The best way to manage your emails.
-                            </p>
-                          </a>
-                        </NavigationMenuLink>
-                      </li>
-                      <ListItem href="/docs" title="Introduction">
-                        Your own multiple mail accounts organizer and manager  powered by AI.
-                      </ListItem>
-                      <ListItem href="/docs/installation" title="Installation">
-                        Install the extension and start using it available for all browsers.
-                      </ListItem>
-                      <ListItem href="/docs/primitives/typography" title="FAQ">
-                        Frequently Asked Questions.
-                      </ListItem>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
 
-                <NavigationMenuItem className="hidden sm:block">
-                  <NavigationMenuTrigger>Features</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-2 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                      {components.map((component) => (
-                        <ListItem
-                          key={component.title}
-                          title={component.title}
-                          href={component.href}
-                        >
-                          {component.description}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem className="hidden sm:block">
-                  <NavigationMenuTrigger>Contact</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[200px] gap-4">
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link href="mailto:sudhanshuk1140@gmail.com">Email Us</Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link href="#contact-form" className="cursor-pointer">Contact Form</Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link href="#">Set up a meeting</Link>
-                        </NavigationMenuLink>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                  <Link href="/pricing">Pricing</Link>
-                </NavigationMenuLink>
-                  </NavigationMenuItem>
-                
-                
-                <NavigationMenuItem className="hidden sm:block">
-                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                  <Link href="/try">Try Now</Link>
-                </NavigationMenuLink>
-                  </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                  {status === "loading" ? (
-                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                      Loading...
-                    </NavigationMenuLink>
-                  ) : session ? (
-                    <div className="relative">
-                      <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className= {navigationMenuTriggerStyle()}>
-                            <User className="mr-2 h-4 w-4 " />
-                            Account
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent 
-                          className="w-56 bg-zinc-800 border-zinc-700 text-white z-[9999]" 
-                          align="end"
-                          sideOffset={5}
-                          avoidCollisions={true}
-                          sticky="always"
-                          side="bottom"
-                          alignOffset={0}
-                        >
-                          <DropdownMenuItem asChild>
-                            <Link href="/settings" className="cursor-pointer">
-                              <Settings className="mr-2 h-4 w-4" />
-                              <span>Settings</span>
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link href="/payments" className="cursor-pointer">
-                              <CreditCard className="mr-2 h-4 w-4" />
-                              <span>Payments</span>
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                            <LogOut className="mr-2 h-4 w-4" />
-                            <span>Log out</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  ) : (
-                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                      <Link href="/login">Login</Link>
-                    </NavigationMenuLink>
-                  )}
-                </NavigationMenuItem>
-              </NavigationMenuList>
-          </NavigationMenu>
-        </div>
       <main className="flex flex-col items-center relative mx-auto">
                  <div className="relative flex flex-col items-center ">
             <span className="mt-40 md:mt-48 lg:mt-60 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-6xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl px-4 w-screen"> 
@@ -382,6 +187,7 @@ export default function Home() {
         </div>
         </div>
         <Features/>
+        <FAQ/>
         
         <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50">
           <TooltipProvider>

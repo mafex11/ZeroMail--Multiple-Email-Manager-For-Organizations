@@ -58,7 +58,7 @@ const ContactForm = () => {
   }
 
   return (
-    <div id="contact-form" className="w-full max-w-4xl mx-auto px-6 py-20">
+    <div id="contact-form" className="w-full max-w-4xl mx-auto px-6 py-10">
       <div className="text-center mb-12">
         <h2 className="doto-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
           Get in Touch

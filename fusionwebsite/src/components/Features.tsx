@@ -90,7 +90,7 @@ const Features = () => {
           {/* Mobile and tablet image */}
           <img src="/featsummob.png" className='mx-auto lg:hidden' />
           {/* Desktop image */}
-          <img src="/featsumm.png" className='mx-auto hidden lg:block lg:w-6xl' />
+          <img src="/featsumm.png" className='mx-auto hidden lg:block lg:w-7xl' />
         </div>
 
         <div 
@@ -110,7 +110,7 @@ const Features = () => {
           {/* Mobile and tablet image */}
           <img src="/featagentmob.png" className='mx-auto lg:hidden' />
           {/* Desktop image */}
-          <img src="/featagent.png" className='mx-auto hidden lg:block lg:w-6xl' />
+          <img src="/featagent.png" className='mx-auto hidden lg:block lg:w-7xl' />
         </div>
 
         <div 
@@ -130,7 +130,7 @@ const Features = () => {
           {/* Mobile and tablet image */}
           <img src="/featotpmob.png" className='mx-auto lg:hidden' />
           {/* Desktop image */}
-          <img src="/featotp.png" className='mx-auto hidden lg:block lg:w-6xl' />
+          <img src="/featotp.png" className='mx-auto hidden lg:block lg:w-7xl' />
         </div>
       </div>
     </div> 
