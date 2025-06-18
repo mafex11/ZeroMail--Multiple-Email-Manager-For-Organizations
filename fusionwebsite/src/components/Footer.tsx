@@ -5,7 +5,7 @@ import { Mail, Phone, MapPin, Github, Linkedin, Twitter, Youtube } from 'lucide-
 
 const Footer = () => {
   return (
-    <footer className="bg-zinc-950 border-t border-zinc-700/50 mt-20">
+    <footer className="bg-zinc-950 border-t border-zinc-700/50">
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           

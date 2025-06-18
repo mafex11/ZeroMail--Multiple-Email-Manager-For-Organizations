@@ -172,3 +172,41 @@
 .animate-shimmer {
   animation: shimmer 3s ease-in-out infinite;
 }
+
+/* Smooth upward scrolling animation for FAQ boxes */
+@keyframes scroll-up {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.animate-scroll-up {
+  animation: scroll-up 15s linear infinite;
+  will-change: transform;
+}
+
+.animate-scroll-up:hover {
+  animation-play-state: paused;
+}
+
+/* Smooth downward scrolling animation for FAQ boxes */
+@keyframes scroll-down {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-scroll-down {
+  animation: scroll-down 15s linear infinite;
+  will-change: transform;
+}
+
+.animate-scroll-down:hover {
+  animation-play-state: paused;
+}

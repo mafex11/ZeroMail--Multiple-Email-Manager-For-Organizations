@@ -7,6 +7,7 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 
 
 const geistSans = Geist({
@@ -44,6 +45,7 @@ export default function RootLayout({
         <SessionProvider>
           <Navigation />
           {children}
+          <Footer />
           <Toaster richColors position="top-right" />
         </SessionProvider>
       </body>

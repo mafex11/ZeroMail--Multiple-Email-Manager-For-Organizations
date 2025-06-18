@@ -17,7 +17,6 @@ import Silk from "@/components/Silk/Silk";
 import { GrDownload  } from "react-icons/gr";
 import ContactForm from "@/components/ContactForm";
 import Features from "@/components/Features";
-import Footer from "@/components/Footer";
 import FAQ from "@/components/FAQ";
 
 export type IconProps = React.HTMLAttributes<SVGElement>;
@@ -241,8 +240,6 @@ export default function Home() {
         
         <ContactForm/>
       </main>
-      
-      <Footer />
     </div>
   );
 }

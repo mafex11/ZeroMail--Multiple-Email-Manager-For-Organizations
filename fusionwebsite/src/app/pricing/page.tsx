@@ -10,7 +10,7 @@ import { keyframes } from "motion/react";
 
 const pricingPlans = [
   {
-    name: "Free Plan",
+    name: "Free",
     price: "$0",
     period: "/forever",
     description: "Perfect for getting started with email management",
@@ -28,7 +28,7 @@ const pricingPlans = [
     badgeColor: "bg-white text-black"
   },
   {
-    name: "Weekly Plan",
+    name: "Weekly",
     price: "$6.99",
     period: "/week",
     description: "Great for testing premium features short-term",
@@ -39,14 +39,14 @@ const pricingPlans = [
       "Advanced search",
       "Priority support"
     ],
-    buttonText: "Start Weekly Plan",
+    buttonText: "Start Weekly",
     popular: true,
     href: "#",
     badge: "Popular",
     badgeColor: "bg-black text-white border border-white"
   },
   {
-    name: "Monthly Plan",
+    name: "Monthly",
     price: "$9.99",
     period: "/month",
     description: "Best value for regular users with unlimited access",
@@ -116,16 +116,25 @@ const faqData = [
   },
   {
     question: "Do all features work with external email APIs?",
-    answer: "Most features work with standard email APIs, but some advanced AI features like smart summarization and OTP detection use our custom processing for better accuracy."
+    answer: "Most features work with standard APIs, but some advanced AI features like smart summarization and OTP detection use our custom processing."
   },
   {
     question: "Is my data secure with FusionMail?",
-    answer: "Absolutely! We use enterprise-grade encryption, secure OAuth authentication, and never store your actual email content. Your privacy and security are our top priorities."
+    answer: "Absolutely! We use enterprise-grade encryption, and never store your actual email content. Your privacy and security are our top priorities."
   },
   {
     question: "Can I cancel my subscription anytime?",
-    answer: "Yes, you can cancel your subscription at any time with no questions asked. You'll continue to have access to premium features until the end of your billing period."
+    answer: "Yes, you can cancel your subscription at any time. You'll continue to have access to premium features until the end of your billing period."
+  },
+  {
+    question: "What browsers are supported?",
+    answer: "FusionMail works on all major browsers including Chrome, Firefox, Safari, and Edge. We recommend using the latest version for the best experience."
+  },
+  {
+    question: "Do you offer team or business plans?",
+    answer: "Currently we focus on individual users, but we're working on team plans with centralized billing and management features. Contact us for early access!"
   }
+  
 ];
 
 export default function PricingPage() {
@@ -171,11 +180,11 @@ const paymentPlanType = planTypeMap[planType]
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-zinc-950 text-white font-sans">
       {/* Header */}
       <div className="container mx-auto px-6 py-60">
         <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold mb-4 doto-navbar">
+          <h1 className="text-6xl font-light mb-4 doto-title">
             <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               Choose Your Plan
             </span>
@@ -193,8 +202,8 @@ const paymentPlanType = planTypeMap[planType]
               key={plan.name}
               className={`relative p-8 rounded-2xl border transition-all duration-300 hover:scale-105 ${
                 plan.popular
-                  ? "border-white bg-gray-900/80 transform scale-105 shadow-2xl shadow-white/10"
-                  : "border-gray-700 bg-gray-900/50 hover:border-gray-500"
+                  ? "border-white bg-zinc-900 transform scale-105 shadow-2xl shadow-white/10"
+                  : "border-gray-700 hover:border-gray-500 bg-zinc-900/50"
               }`}
             >
               {/* Badge */}
@@ -207,17 +216,18 @@ const paymentPlanType = planTypeMap[planType]
               )}
 
               {/* Plan Header */}
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <p className="text-gray-400 text-sm mb-4">{plan.description}</p>
-                <div className="flex items-baseline justify-center">
-                  <span className="text-4xl font-bold">{plan.price}</span>
+              <div className="text-left mb-6">
+                <h3 className="text-2xl  mb-2">{plan.name}</h3>
+                {/* <p className="text-gray-400 text-sm mb-4">{plan.description}</p> */}
+                <div className="flex items-baseline mb-4">
+                  <span className="text-5xl font-semibold mt-6">{plan.price}</span>
                   <span className="text-gray-400 ml-1">{plan.period}</span>
                 </div>
+                <div className="w-full h-px bg-gray-700"></div>
               </div>
 
               {/* Features */}
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-3 mb-8 ">
                 {plan.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-center text-sm">
                     <CheckIcon className="w-5 h-5 text-white mr-3 flex-shrink-0" />
@@ -254,45 +264,162 @@ const paymentPlanType = planTypeMap[planType]
         </div>
 
         {/* FAQ Bento Grid Section */}
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16 doto-navbar">
+        <div className="max-w-7xl mx-auto ">
+          <h2 className="text-6xl font-light mt-30 text-center  doto-title ">
             <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               Frequently Asked Questions
             </span>
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-            {faqData.slice(0, 8).map((faq, index) => (
-              <div
-                key={index}
-                className={`
-                  relative p-6 rounded-2xl bg-gray-900/50 border border-gray-700 
-                  hover:border-gray-500 transition-all duration-300 group
-                  ${index === 0 ? 'lg:col-span-1' : ''}
-                  ${index === 1 ? 'lg:col-span-1' : ''}
-                  ${index === 2 ? 'lg:col-span-1' : ''}
-                  ${index === 3 ? 'lg:col-span-1' : ''}
-                  ${index === 4 ? 'lg:col-span-1' : ''}
-                  ${index === 5 ? 'lg:col-span-1' : ''}
-                  ${index === 6 ? 'lg:col-span-2' : ''}
-                  ${index === 7 ? 'lg:col-span-1' : ''}
-                `}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="relative z-10">
-                  <h3 className="text-lg font-semibold mb-4 text-white group-hover:text-gray-100 transition-colors">
-                    {faq.question}
-                  </h3>
-                  <p className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">
-                    {faq.answer}
-                  </p>
-                </div>
-              </div>
-            ))}
+          
+          <h2 className="text-xl text-gray-400 max-w-2xl mx-auto text-center mt-4 mb-20 ">
+            <span className="text-gray-400 text-lg text-center mb-10">
+              We're here to help you get the most out of FusionMail. If you have any questions, please don't hesitate to contact us.
+            </span>
+          </h2>
+          {/* FAQ Grid Container with Fade Effects */}
+          <div className="relative w-full max-w-7xl mx-auto">
+            {/* Top Fade Overlay */}
+            <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-zinc-950 to-transparent z-10 pointer-events-none" />
+            
+            {/* Bottom Fade Overlay */}
+            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-zinc-950 to-transparent z-10 pointer-events-none" />
+            
+            {/* Main Grid */}
+            <div className="w-full max-w-7xl mx-auto h-[800px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+             {/* Column 1 - Animated boxes */}
+             <div className="h-full overflow-hidden relative">
+               <div className="animate-scroll-up">
+                 {/* First set of boxes */}
+                 {faqData.slice(0, 4).map((faq, index) => (
+                   <div
+                     key={index}
+                     className="relative h-48 p-4 mb-3 rounded-xl bg-zinc-900 border border-gray-600 hover:border-gray-500 transition-all duration-300 group overflow-hidden flex-shrink-0"
+                   >
+                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                     <div className="relative z-10 h-full flex flex-col">
+                       <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-white transition-colors line-clamp-2">
+                         {faq.question}
+                       </h3>
+                       <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent mb-2 opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+                       <p className="text-sm font-thin text-gray-300 leading-relaxed group-hover:text-gray-100 transition-colors flex-1 overflow-hidden line-clamp-4">
+                         {faq.answer}
+                       </p>
+                     </div>
+                   </div>
+                 ))}
+                 
+                 {/* Duplicate set for seamless loop */}
+                 {faqData.slice(0, 4).map((faq, index) => (
+                   <div
+                     key={`duplicate-${index}`}
+                     className="relative h-48 p-4 mb-3 rounded-xl bg-zinc-900 border border-gray-600 hover:border-gray-500 transition-all duration-300 group overflow-hidden flex-shrink-0"
+                   >
+                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                     <div className="relative z-10 h-full flex flex-col">
+                       <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-white transition-colors line-clamp-2">
+                         {faq.question}
+                       </h3>
+                       <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent mb-2 opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+                       <p className="text-sm font-thin text-gray-300 leading-relaxed group-hover:text-gray-100 transition-colors flex-1 overflow-hidden line-clamp-4">
+                         {faq.answer}
+                       </p>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             </div>
+
+             {/* Column 2 - Animated boxes (downward) */}
+             <div className="h-full overflow-hidden relative">
+               <div className="animate-scroll-down">
+                 {/* First set of boxes */}
+                 {faqData.slice(4, 7).map((faq, index) => (
+                   <div
+                     key={index + 4}
+                     className="relative h-64 p-4 mb-4 rounded-xl bg-zinc-900 border border-gray-600 hover:border-gray-500 transition-all duration-300 group overflow-hidden flex-shrink-0"
+                   >
+                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                     <div className="relative z-10 h-full flex flex-col">
+                       <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-white transition-colors line-clamp-2">
+                         {faq.question}
+                       </h3>
+                       <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent mb-3 opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+                       <p className="text-sm font-thin text-gray-300 leading-relaxed group-hover:text-gray-100 transition-colors flex-1 overflow-hidden line-clamp-5">
+                         {faq.answer}
+                       </p>
+                     </div>
+                   </div>
+                 ))}
+                 
+                 {/* Duplicate set for seamless loop */}
+                 {faqData.slice(4, 7).map((faq, index) => (
+                   <div
+                     key={`duplicate-${index + 4}`}
+                     className="relative h-64 p-4 mb-4 rounded-xl bg-zinc-900 border border-gray-600 hover:border-gray-500 transition-all duration-300 group overflow-hidden flex-shrink-0"
+                   >
+                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                     <div className="relative z-10 h-full flex flex-col">
+                       <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-white transition-colors line-clamp-2">
+                         {faq.question}
+                       </h3>
+                       <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent mb-3 opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+                       <p className="text-sm font-thin text-gray-300 leading-relaxed group-hover:text-gray-100 transition-colors flex-1 overflow-hidden line-clamp-5">
+                         {faq.answer}
+                       </p>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             </div>
+
+             {/* Column 3 - Animated boxes (upward) */}
+             <div className="h-full overflow-hidden relative">
+               <div className="animate-scroll-up">
+                 {/* First set of boxes */}
+                 {faqData.slice(7, 11).map((faq, index) => (
+                   <div
+                     key={index + 7}
+                     className="relative h-48 p-4 mb-3 rounded-xl bg-zinc-900 border border-gray-600 hover:border-gray-500 transition-all duration-300 group overflow-hidden flex-shrink-0"
+                   >
+                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                     <div className="relative z-10 h-full flex flex-col">
+                       <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-white transition-colors line-clamp-2">
+                         {faq.question}
+                       </h3>
+                       <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent mb-2 opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+                       <p className="text-sm font-thin text-gray-300 leading-relaxed group-hover:text-gray-100 transition-colors flex-1 overflow-hidden line-clamp-4">
+                         {faq.answer}
+                       </p>
+                     </div>
+                   </div>
+                 ))}
+                 
+                 {/* Duplicate set for seamless loop */}
+                 {faqData.slice(7, 11).map((faq, index) => (
+                   <div
+                     key={`duplicate-${index + 7}`}
+                     className="relative h-48 p-4 mb-3 rounded-xl bg-zinc-900 border border-gray-600 hover:border-gray-500 transition-all duration-300 group overflow-hidden flex-shrink-0"
+                   >
+                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                     <div className="relative z-10 h-full flex flex-col">
+                       <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-white transition-colors line-clamp-2">
+                         {faq.question}
+                       </h3>
+                       <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent mb-2 opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+                       <p className="text-sm font-thin text-gray-300 leading-relaxed group-hover:text-gray-100 transition-colors flex-1 overflow-hidden line-clamp-4">
+                         {faq.answer}
+                       </p>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             </div>
+           </div>
           </div>
         </div>
 
         {/* CTA Section */}
-        <div className="text-center mt-16 p-8 rounded-2xl bg-gray-900/50 border border-gray-700">
+        {/* <div className="text-center mt-16 p-8 rounded-2xl bg-gray-900/50 border border-gray-700">
           <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
             <StarIcon className="w-6 h-6 text-black" />
           </div>
@@ -318,7 +445,7 @@ const paymentPlanType = planTypeMap[planType]
               View Demo
             </Button>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

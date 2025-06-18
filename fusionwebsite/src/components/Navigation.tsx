@@ -149,26 +149,24 @@ export default function Navigation() {
               </NavigationMenuLink>
                 </NavigationMenuItem>
               
-              
-              <NavigationMenuItem className="hidden sm:block">
+                <NavigationMenuItem>
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                <Link href="/try">Try Now</Link>
+                <Link href="/about">About Us</Link>
               </NavigationMenuLink>
                 </NavigationMenuItem>
 
-              <NavigationMenuItem className="hidden sm:block">
-                <NavigationMenuTrigger>More</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[200px] gap-2">
-                    <ListItem href="/about" title="About Us">
-                      Learn more about Fusion Mail and our mission.
-                    </ListItem>
-                    <ListItem href="/privacy" title="Privacy Policy">
-                      Read our privacy policy and data handling practices.
-                    </ListItem>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
+                <NavigationMenuItem>
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                <Link href="/privacy">Privacy Policy</Link>
+              </NavigationMenuLink>
+                </NavigationMenuItem>
+              {/* <NavigationMenuItem className="hidden sm:block">
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                <Link href="/try">Try Now</Link>
+              </NavigationMenuLink>
+                </NavigationMenuItem> */}
+
+        
               
               <NavigationMenuItem>
                 {status === "loading" ? (
