@@ -58,7 +58,7 @@ const ContactForm = () => {
   }
 
   return (
-    <div id="contact-form" className="w-full max-w-4xl mx-auto px-6 py-10">
+    <div id="contact-form" className="w-full max-w-4xl mx-auto py-10">
       <div className="text-center mb-12">
         <h2 className="doto-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
           Get in Touch
@@ -71,12 +71,12 @@ const ContactForm = () => {
         </p>
       </div>
 
-      <Card className="bg-gradient-to-br from-black via-gray-900 to-black border border-white/20 backdrop-blur-md shadow-2xl shadow-white/10 relative overflow-hidden">
+      <Card className="bg-gradient-to-br from-black via-zinc-900 to-black border border-white/20 backdrop-blur-md shadow-2xl shadow-white/10 relative overflow-hidden">
         {/* Shiny overlay effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform -skew-x-12 -translate-x-full animate-shimmer"></div>
         
         <CardHeader className="relative z-10">
-          <CardTitle className="text-white flex items-center gap-2 text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+          <CardTitle className="text-white flex items-center gap-2 text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text ">
             <Mail className="h-6 w-6 text-white drop-shadow-lg" />
             Contact Us
           </CardTitle>
@@ -99,7 +99,7 @@ const ContactForm = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="bg-gradient-to-r from-black to-gray-900 border-2 border-white/30 text-white placeholder:text-gray-400 focus:border-white/60 focus:ring-2 focus:ring-white/20 transition-all duration-300 shadow-inner"
+                  className="bg-gradient-to-r from-black to-zinc-900 border-2 border-white/30 text-white placeholder:text-gray-400 focus:border-white/60 focus:ring-2 focus:ring-white/20 transition-all duration-300 shadow-inner"
                   placeholder="Your full name"
                 />
               </div>
@@ -116,7 +116,7 @@ const ContactForm = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="bg-gradient-to-r from-black to-gray-900 border-2 border-white/30 text-white placeholder:text-gray-400 focus:border-white/60 focus:ring-2 focus:ring-white/20 transition-all duration-300 shadow-inner"
+                  className="bg-gradient-to-r from-black to-zinc-900 border-2 border-white/30 text-white placeholder:text-gray-400 focus:border-white/60 focus:ring-2 focus:ring-white/20 transition-all duration-300 shadow-inner"
                   placeholder="your.email@example.com"
                 />
               </div>
@@ -134,7 +134,7 @@ const ContactForm = () => {
                 value={formData.subject}
                 onChange={handleChange}
                 required
-                className="bg-gradient-to-r from-black to-gray-900 border-2 border-white/30 text-white placeholder:text-gray-400 focus:border-white/60 focus:ring-2 focus:ring-white/20 transition-all duration-300 shadow-inner"
+                className="bg-gradient-to-r from-black to-zinc-900 border-2 border-white/30 text-white placeholder:text-gray-400 focus:border-white/60 focus:ring-2 focus:ring-white/20 transition-all duration-300 shadow-inner"
                 placeholder="What's this about?"
               />
             </div>
@@ -151,7 +151,7 @@ const ContactForm = () => {
                 onChange={handleChange}
                 required
                 rows={6}
-                className="bg-gradient-to-r from-black to-gray-900 border-2 border-white/30 text-white placeholder:text-gray-400 focus:border-white/60 focus:ring-2 focus:ring-white/20 transition-all duration-300 shadow-inner resize-none"
+                className="bg-gradient-to-r from-black to-zinc-900 border-2 border-white/30 text-white placeholder:text-gray-400 focus:border-white/60 focus:ring-2 focus:ring-white/20 transition-all duration-300 shadow-inner resize-none"
                 placeholder="Tell us more about your inquiry..."
               />
             </div>
@@ -173,7 +173,7 @@ const ContactForm = () => {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-black via-gray-800 to-black border-2 border-white/40 hover:border-white/60 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-2xl hover:shadow-white/20 hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group"
+              className="w-full bg-gradient-to-r from-black via-zinc-800 to-black border-2 border-white/40 hover:border-white/60 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-2xl hover:shadow-white/20 hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group"
             >
               {/* Button shine effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>

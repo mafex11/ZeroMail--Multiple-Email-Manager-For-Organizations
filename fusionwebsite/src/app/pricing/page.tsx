@@ -21,7 +21,7 @@ const pricingPlans = [
       "Basic email management",
       "Multiple account support"
     ],
-    buttonText: "Get Started Free",
+    buttonText: "Download Now",
     popular: false,
     href: "#",
     badge: "Free Forever",
@@ -264,7 +264,7 @@ const paymentPlanType = planTypeMap[planType]
         </div>
 
         {/* FAQ Bento Grid Section */}
-        <div className="max-w-7xl mx-auto ">
+        <div className="max-w-7xl mx-auto hidden md:block">
           <h2 className="text-6xl font-light mt-30 text-center  doto-title ">
             <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               Frequently Asked Questions

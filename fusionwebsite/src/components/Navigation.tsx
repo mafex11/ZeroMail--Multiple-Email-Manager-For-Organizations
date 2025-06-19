@@ -133,7 +133,7 @@ export default function Navigation() {
                         <Link href="mailto:sudhanshuk1140@gmail.com">Email Us</Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link href="#contact-form" className="cursor-pointer">Contact Form</Link>
+                        <Link href="/#contact-form" className="cursor-pointer">Contact Form</Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
                         <Link href="#">Set up a meeting</Link>

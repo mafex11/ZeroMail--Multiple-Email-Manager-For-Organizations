@@ -241,6 +241,29 @@ export default function Home() {
         </div>
         
         <ContactForm/>
+        
+        {/* Try for Free Section */}
+        <div className="w-full flex flex-col items-center justify-center mt-20 mb-20 ">
+          <div className="text-center max-w-7xl mx-auto">
+            <h2 className="doto-title text-2xl sm:text-2xl md:text-3xl lg:text-5xl font-bold text-white mb-6">
+              Ready to Transform Your Email Experience?
+            </h2>
+            <p className="text-xl sm:text-2xl md:text-2xl text-gray-300 mb-10 max-w-3xl mx-auto font-thin">
+              Join thousands of users who have revolutionized their email workflow with Fusion Mail.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+             
+              <Link href="/login">
+                <InteractiveHoverButton className="h-12 px-6 text-lg">
+                  Get Started Now
+                </InteractiveHoverButton>
+              </Link>
+            </div>
+            <p className="text-sm text-gray-400 mt-6">
+              No credit card required • Free forever 
+            </p>
+          </div>
+        </div>
       </main>
     </div>
   );
