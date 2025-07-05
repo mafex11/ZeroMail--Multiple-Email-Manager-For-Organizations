@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, Shield, Lock, Eye, Database, CreditCard, Mail } from "lucide-react";
+import { ArrowLeft, Shield, Lock, Eye, Database, CreditCard, Mail, Chrome, Zap, Bot } from "lucide-react";
 
 export default function PrivacyPolicyPage() {
   return (
@@ -21,30 +21,43 @@ export default function PrivacyPolicyPage() {
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Shield className="w-8 h-8 text-white" />
-            <h1 className="text-4xl font-bold doto-navbar">Privacy Policy</h1>
+            <h1 className="text-5xl font-bold doto-title">Privacy Policy</h1>
           </div>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Your privacy is important to us. This policy explains how we collect, use, and protect your information.
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            This privacy policy explains how Fusion Mail Chrome Extension collects, uses, and protects your information when you use our Gmail productivity extension.
           </p>
           <p className="text-sm text-gray-500 mt-2">
             Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
 
+        {/* Extension Notice */}
+        <div className="max-w-4xl mx-auto mb-8">
+          <div className="bg-gray-900/50 border border-gray-600 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <Chrome className="w-6 h-6 text-white" />
+              <h3 className="text-xl font-semibold text-white">Chrome Extension Privacy Notice</h3>
+            </div>
+            <p className="text-gray-300">
+              This privacy policy specifically covers the Fusion Mail Chrome Extension. The extension enhances your Gmail experience with AI-powered email summaries, automatic OTP detection and autofill, and streamlined multi-account management.
+            </p>
+          </div>
+        </div>
+
         {/* Table of Contents */}
         <div className="max-w-4xl mx-auto mb-12">
           <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
-            <h2 className="text-lg font-semibold mb-4 text-white">Table of Contents</h2>
+            <h2 className="text-xl font-semibold mb-4 text-white">Table of Contents</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
               <a href="#information-we-collect" className="text-gray-400 hover:text-white transition-colors">1. Information We Collect</a>
-              <a href="#how-we-use-information" className="text-gray-400 hover:text-white transition-colors">2. How We Use Information</a>
-              <a href="#email-access" className="text-gray-400 hover:text-white transition-colors">3. Email Access & Processing</a>
-              <a href="#payment-information" className="text-gray-400 hover:text-white transition-colors">4. Payment Information</a>
-              <a href="#data-security" className="text-gray-400 hover:text-white transition-colors">5. Data Security</a>
-              <a href="#data-sharing" className="text-gray-400 hover:text-white transition-colors">6. Data Sharing</a>
-              <a href="#your-rights" className="text-gray-400 hover:text-white transition-colors">7. Your Rights</a>
-              <a href="#data-retention" className="text-gray-400 hover:text-white transition-colors">8. Data Retention</a>
-              <a href="#cookies" className="text-gray-400 hover:text-white transition-colors">9. Cookies & Tracking</a>
+              <a href="#chrome-permissions" className="text-gray-400 hover:text-white transition-colors">2. Chrome Extension Permissions</a>
+              <a href="#email-processing" className="text-gray-400 hover:text-white transition-colors">3. Email Data Processing</a>
+              <a href="#ai-services" className="text-gray-400 hover:text-white transition-colors">4. AI Services & Third Parties</a>
+              <a href="#data-storage" className="text-gray-400 hover:text-white transition-colors">5. Data Storage</a>
+              <a href="#otp-functionality" className="text-gray-400 hover:text-white transition-colors">6. OTP Functionality</a>
+              <a href="#data-security" className="text-gray-400 hover:text-white transition-colors">7. Data Security</a>
+              <a href="#your-rights" className="text-gray-400 hover:text-white transition-colors">8. Your Rights</a>
+              <a href="#data-retention" className="text-gray-400 hover:text-white transition-colors">9. Data Retention</a>
               <a href="#changes" className="text-gray-400 hover:text-white transition-colors">10. Changes to Policy</a>
               <a href="#contact" className="text-gray-400 hover:text-white transition-colors">11. Contact Us</a>
             </div>
@@ -57,238 +70,391 @@ export default function PrivacyPolicyPage() {
           {/* Section 1 */}
           <section id="information-we-collect" className="scroll-mt-8">
             <div className="flex items-center gap-3 mb-6">
-              <Database className="w-6 h-6 text-blue-400" />
-              <h2 className="text-2xl font-bold">1. Information We Collect</h2>
+              <Database className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold">1. Information We Collect</h2>
             </div>
             
             <div className="space-y-6 text-gray-300 leading-relaxed">
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Account Information</h3>
+                <h3 className="text-xl font-semibold text-white mb-3">Personal Information</h3>
                 <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Name and email address when you create an account</li>
-                  <li>Password (encrypted and never stored in plain text)</li>
-                  <li>Account preferences and settings</li>
-                  <li>Subscription plan and payment history</li>
+                  <li><strong>Email addresses:</strong> Your Gmail account email addresses for account management</li>
+                  <li><strong>Profile information:</strong> Name and profile picture from your Google account</li>
+                  <li><strong>Authentication data:</strong> OAuth tokens to access your Gmail account</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Email Data</h3>
+                <h3 className="text-xl font-semibold text-white mb-3">Email Content</h3>
                 <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Email content for AI processing and summarization</li>
-                  <li>Email metadata (sender, recipient, timestamps)</li>
-                  <li>OTP codes for automatic detection and filling</li>
-                  <li>Email attachments when necessary for processing</li>
+                  <li><strong>Email messages:</strong> Subject lines, content, and snippets for AI summarization</li>
+                  <li><strong>Email metadata:</strong> Sender, recipient, timestamps, and labels</li>
+                  <li><strong>OTP codes:</strong> One-time passwords detected in email content for autofill</li>
+                  <li><strong>Email threads:</strong> Conversation context for AI chat functionality</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Usage Information</h3>
+                <h3 className="text-xl font-semibold text-white mb-3">Usage Data</h3>
                 <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Feature usage patterns and analytics</li>
-                  <li>AI chat queries and interactions</li>
-                  <li>Browser type and operating system</li>
-                  <li>IP address and general location</li>
+                  <li><strong>Feature usage:</strong> Which features you use and how often</li>
+                  <li><strong>Subscription status:</strong> Whether you have an active paid subscription</li>
+                  <li><strong>Usage limits:</strong> Tracking for free tier limitations</li>
+                  <li><strong>Extension settings:</strong> Your preferences and configuration</li>
                 </ul>
               </div>
             </div>
           </section>
 
           {/* Section 2 */}
-          <section id="how-we-use-information" className="scroll-mt-8">
+          <section id="chrome-permissions" className="scroll-mt-8">
             <div className="flex items-center gap-3 mb-6">
-              <Eye className="w-6 h-6 text-green-400" />
-              <h2 className="text-2xl font-bold">2. How We Use Your Information</h2>
+              <Chrome className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold">2. Chrome Extension Permissions</h2>
             </div>
             
             <div className="space-y-4 text-gray-300 leading-relaxed">
-              <p>We use your information to:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Provide our services:</strong> Email management, AI chat, OTP detection, and summaries</li>
-                <li><strong>Process payments:</strong> Handle subscriptions and billing through secure payment processors</li>
-                <li><strong>Improve our services:</strong> Analyze usage patterns to enhance features and performance</li>
-                <li><strong>Customer support:</strong> Respond to inquiries and provide technical assistance</li>
-                <li><strong>Security:</strong> Protect against fraud, abuse, and unauthorized access</li>
-                <li><strong>Legal compliance:</strong> Meet regulatory requirements and legal obligations</li>
-              </ul>
+              <p>Our extension requires the following Chrome permissions:</p>
+              
+              <div className="space-y-4">
+                <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+                  <h4 className="font-semibold text-white mb-2">identity</h4>
+                  <p>Used for Google OAuth2 authentication to securely access your Gmail account without storing passwords.</p>
+                </div>
+                
+                <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+                  <h4 className="font-semibold text-white mb-2">storage</h4>
+                  <p>Stores email summaries, account information, user preferences, and subscription data locally in your browser.</p>
+                </div>
+                
+                <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+                  <h4 className="font-semibold text-white mb-2">activeTab</h4>
+                  <p>Communicates with the current tab to detect OTP input fields and automatically fill detected OTP codes.</p>
+                </div>
+                
+                <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+                  <h4 className="font-semibold text-white mb-2">clipboardWrite</h4>
+                  <p>Copies detected OTP codes to your clipboard when autofill is not possible.</p>
+                </div>
+                
+                <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+                  <h4 className="font-semibold text-white mb-2">notifications</h4>
+                  <p>Shows notifications when OTP codes are detected, copied, or successfully autofilled.</p>
+                </div>
+                
+                <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+                  <h4 className="font-semibold text-white mb-2">Host Permissions</h4>
+                  <p>Access to mail.google.com, accounts.google.com, and googleapis.com for Gmail functionality and authentication.</p>
+                </div>
+              </div>
             </div>
           </section>
 
           {/* Section 3 */}
-          <section id="email-access" className="scroll-mt-8">
+          <section id="email-processing" className="scroll-mt-8">
             <div className="flex items-center gap-3 mb-6">
-              <Mail className="w-6 h-6 text-purple-400" />
-              <h2 className="text-2xl font-bold">3. Email Access & Processing</h2>
+              <Mail className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold">3. Email Data Processing</h2>
             </div>
             
             <div className="space-y-4 text-gray-300 leading-relaxed">
-              <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-4">
-                <p className="text-yellow-200">
-                  <strong>Important:</strong> Fusion Mail requires access to your email accounts to provide its services. 
-                  Here's how we handle your email data:
+              <div className="bg-gray-800/50 border border-gray-600 rounded-lg p-4">
+                <p className="text-gray-200">
+                  <strong>Important:</strong> We process your email data to provide AI summaries, OTP detection, and enhanced Gmail functionality. Here's exactly how we handle your emails:
                 </p>
               </div>
               
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Read-only access:</strong> We only read your emails, never send or delete them</li>
-                <li><strong>Local processing:</strong> Email content is processed locally when possible</li>
-                <li><strong>Temporary storage:</strong> Email data is temporarily cached for AI processing</li>
-                <li><strong>No human access:</strong> Our staff never manually read your personal emails</li>
-                <li><strong>Encryption:</strong> All email data is encrypted in transit and at rest</li>
-                <li><strong>User control:</strong> You can revoke email access at any time</li>
-              </ul>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Local Processing</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>OTP detection and extraction happens locally in your browser</li>
+                    <li>Email caching and organization is stored locally</li>
+                    <li>Account management and preferences are stored locally</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-white mb-2">AI Processing</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Email content is sent to DeepSeek AI for summarization</li>
+                    <li>Only email subject and snippet (first few lines) are processed</li>
+                    <li>AI summaries are cached locally to avoid reprocessing</li>
+                    <li>No email content is permanently stored by AI service</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Read-Only Access</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>We only read your emails, never send, modify, or delete them</li>
+                    <li>No access to email drafts or sent items unless explicitly requested</li>
+                    <li>Gmail labels and organization features are read-only</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </section>
 
           {/* Section 4 */}
-          <section id="payment-information" className="scroll-mt-8">
+          <section id="ai-services" className="scroll-mt-8">
             <div className="flex items-center gap-3 mb-6">
-              <CreditCard className="w-6 h-6 text-orange-400" />
-              <h2 className="text-2xl font-bold">4. Payment Information</h2>
+              <Bot className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold">4. AI Services & Third Parties</h2>
             </div>
             
             <div className="space-y-4 text-gray-300 leading-relaxed">
-              <p>For payment processing, we work with trusted third-party providers:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Razorpay:</strong> Handles all payment transactions securely</li>
-                <li><strong>No card storage:</strong> We never store your credit card information</li>
-                <li><strong>Transaction records:</strong> We keep records of payments for billing and support</li>
-                <li><strong>Refund processing:</strong> Payment data is retained for refund and dispute resolution</li>
-                <li><strong>PCI compliance:</strong> All payment processing meets industry security standards</li>
-              </ul>
+              <div>
+                <h4 className="font-semibold text-white mb-2">DeepSeek AI</h4>
+                <p className="mb-2">We use DeepSeek AI for email summarization:</p>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li>Only email subject and snippet are sent for processing</li>
+                  <li>Data is transmitted securely via HTTPS</li>
+                  <li>No personal identifiers are included in AI requests</li>
+                  <li>AI responses are cached locally to minimize API calls</li>
+                  <li>DeepSeek processes data according to their privacy policy</li>
+                </ul>
+              </div>
               
-              <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4">
-                <p className="text-blue-200">
-                  Your payment information is processed according to Razorpay's privacy policy and 
-                  industry-standard security practices.
-                </p>
+              <div>
+                <h4 className="font-semibold text-white mb-2">Google APIs</h4>
+                <p className="mb-2">We use Google's official APIs for:</p>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li>Gmail API for reading emails and managing labels</li>
+                  <li>Google OAuth2 for secure authentication</li>
+                  <li>Google Identity API for profile information</li>
+                </ul>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-white mb-2">Razorpay (Payment Processing)</h4>
+                <p className="mb-2">For subscription payments:</p>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li>Handles all payment transactions securely</li>
+                  <li>We never store credit card information</li>
+                  <li>Payment data is processed according to Razorpay's privacy policy</li>
+                </ul>
               </div>
             </div>
           </section>
 
           {/* Section 5 */}
-          <section id="data-security" className="scroll-mt-8">
+          <section id="data-storage" className="scroll-mt-8">
             <div className="flex items-center gap-3 mb-6">
-              <Lock className="w-6 h-6 text-red-400" />
-              <h2 className="text-2xl font-bold">5. Data Security</h2>
+              <Database className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold">5. Data Storage</h2>
             </div>
             
             <div className="space-y-4 text-gray-300 leading-relaxed">
-              <p>We implement multiple layers of security to protect your data:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Encryption:</strong> All data is encrypted in transit (TLS) and at rest (AES-256)</li>
-                <li><strong>Access controls:</strong> Strict employee access controls and authentication</li>
-                <li><strong>Regular audits:</strong> Security assessments and vulnerability testing</li>
-                <li><strong>Secure infrastructure:</strong> Industry-standard hosting with security monitoring</li>
-                <li><strong>Data backups:</strong> Regular encrypted backups for data recovery</li>
-                <li><strong>Incident response:</strong> Procedures for handling security incidents</li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Section 6 */}
-          <section id="data-sharing" className="scroll-mt-8">
-            <div className="flex items-center gap-3 mb-6">
-              <Shield className="w-6 h-6 text-teal-400" />
-              <h2 className="text-2xl font-bold">6. Data Sharing</h2>
-            </div>
-            
-            <div className="space-y-4 text-gray-300 leading-relaxed">
-              <p>We do not sell your personal information. We may share data only in these limited circumstances:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Service providers:</strong> Trusted partners who help us operate our services</li>
-                <li><strong>Legal requirements:</strong> When required by law or to protect our rights</li>
-                <li><strong>Business transfers:</strong> In case of merger, acquisition, or sale of assets</li>
-                <li><strong>With consent:</strong> When you explicitly authorize us to share information</li>
-              </ul>
+              <div>
+                <h4 className="font-semibold text-white mb-2">Local Storage (Chrome Extension)</h4>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li><strong>OAuth tokens:</strong> Encrypted access tokens for Gmail API</li>
+                  <li><strong>Email summaries:</strong> AI-generated summaries cached locally</li>
+                  <li><strong>Account information:</strong> Email addresses and profile data</li>
+                  <li><strong>User preferences:</strong> Settings and configuration</li>
+                  <li><strong>Usage tracking:</strong> Feature usage for free tier limits</li>
+                </ul>
+              </div>
               
-              <div className="bg-green-900/20 border border-green-700 rounded-lg p-4">
-                <p className="text-green-200">
-                  <strong>We never:</strong> Sell your data to advertisers, share email content with third parties, 
-                  or use your data for marketing by other companies.
+              <div>
+                <h4 className="font-semibold text-white mb-2">Server Storage (Subscription Service)</h4>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li><strong>User accounts:</strong> Email, encrypted password, subscription status</li>
+                  <li><strong>Payment records:</strong> Transaction history and billing information</li>
+                  <li><strong>Usage analytics:</strong> Anonymized feature usage statistics</li>
+                </ul>
+              </div>
+              
+              <div className="bg-gray-800/50 border border-gray-600 rounded-lg p-4">
+                <p className="text-gray-200">
+                  <strong>Privacy First:</strong> Most data is stored locally in your browser. We only store essential account and billing information on our servers.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* Section 7 */}
-          <section id="your-rights" className="scroll-mt-8">
+          {/* Section 6 */}
+          <section id="otp-functionality" className="scroll-mt-8">
             <div className="flex items-center gap-3 mb-6">
-              <Eye className="w-6 h-6 text-indigo-400" />
-              <h2 className="text-2xl font-bold">7. Your Rights</h2>
+              <Zap className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold">6. OTP Functionality</h2>
             </div>
             
             <div className="space-y-4 text-gray-300 leading-relaxed">
-              <p>You have the following rights regarding your personal data:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Access:</strong> Request a copy of your personal data</li>
-                <li><strong>Correction:</strong> Update or correct inaccurate information</li>
-                <li><strong>Deletion:</strong> Request deletion of your account and data</li>
-                <li><strong>Portability:</strong> Export your data in a readable format</li>
-                <li><strong>Withdrawal:</strong> Revoke consent for data processing</li>
-                <li><strong>Objection:</strong> Object to certain types of data processing</li>
-              </ul>
+              <p>Our OTP (One-Time Password) feature works as follows:</p>
               
-              <p>To exercise these rights, please contact us at privacy@fusionmail.com</p>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-white mb-2">OTP Detection</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Scans email content for common OTP patterns (6-digit codes, etc.)</li>
+                    <li>Uses regular expressions to identify verification codes</li>
+                    <li>Processes emails locally without sending OTP data to external servers</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Autofill Process</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Detects OTP input fields on web pages</li>
+                    <li>Automatically fills detected OTP codes when possible</li>
+                    <li>Falls back to clipboard copying if autofill fails</li>
+                    <li>Shows notifications to keep you informed</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Security Measures</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>OTP codes are only kept in memory for 2 minutes</li>
+                    <li>No permanent storage of OTP codes</li>
+                    <li>Only works with the active tab for security</li>
+                    <li>User can disable OTP functionality at any time</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Section 7 */}
+          <section id="data-security" className="scroll-mt-8">
+            <div className="flex items-center gap-3 mb-6">
+              <Lock className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold">7. Data Security</h2>
+            </div>
+            
+            <div className="space-y-4 text-gray-300 leading-relaxed">
+              <p>We implement comprehensive security measures:</p>
+              
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Encryption</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>All data transmission uses HTTPS/TLS encryption</li>
+                    <li>OAuth tokens are encrypted in local storage</li>
+                    <li>Server data is encrypted at rest</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Access Controls</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>OAuth2 authentication with Google</li>
+                    <li>Minimal permission requests</li>
+                    <li>Regular security audits and updates</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Data Minimization</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Only collect data necessary for functionality</li>
+                    <li>Process data locally when possible</li>
+                    <li>Regular cleanup of cached data</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </section>
 
           {/* Section 8 */}
-          <section id="data-retention" className="scroll-mt-8">
+          <section id="your-rights" className="scroll-mt-8">
             <div className="flex items-center gap-3 mb-6">
-              <Database className="w-6 h-6 text-yellow-400" />
-              <h2 className="text-2xl font-bold">8. Data Retention</h2>
+              <Eye className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold">8. Your Rights</h2>
             </div>
             
             <div className="space-y-4 text-gray-300 leading-relaxed">
-              <p>We retain your data for different periods based on its type and purpose:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Account data:</strong> Until you delete your account</li>
-                <li><strong>Email content:</strong> Temporarily cached, then deleted after processing</li>
-                <li><strong>Payment records:</strong> 7 years for tax and legal compliance</li>
-                <li><strong>Usage analytics:</strong> Anonymized after 2 years</li>
-                <li><strong>Support tickets:</strong> 3 years for quality improvement</li>
-              </ul>
+              <p>You have complete control over your data:</p>
+              
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Access and Control</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li><strong>Revoke access:</strong> Remove Gmail permissions at any time through Google Account settings</li>
+                    <li><strong>Delete data:</strong> Uninstall the extension to remove all local data</li>
+                    <li><strong>Export data:</strong> Request a copy of your stored data</li>
+                    <li><strong>Modify settings:</strong> Control which features are enabled</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Data Requests</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Request deletion of server-stored account data</li>
+                    <li>Request information about what data we have</li>
+                    <li>Object to specific data processing activities</li>
+                    <li>Withdraw consent for optional features</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="bg-gray-800/50 border border-gray-600 rounded-lg p-4">
+                <p className="text-gray-200">
+                  <strong>Easy Opt-Out:</strong> Simply uninstall the extension or revoke Gmail permissions in your Google Account to stop all data processing.
+                </p>
+              </div>
             </div>
           </section>
 
           {/* Section 9 */}
-          <section id="cookies" className="scroll-mt-8">
+          <section id="data-retention" className="scroll-mt-8">
             <div className="flex items-center gap-3 mb-6">
-              <Eye className="w-6 h-6 text-pink-400" />
-              <h2 className="text-2xl font-bold">9. Cookies & Tracking</h2>
+              <Database className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold">9. Data Retention</h2>
             </div>
             
             <div className="space-y-4 text-gray-300 leading-relaxed">
-              <p>We use cookies and similar technologies for:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Authentication:</strong> Keep you logged in to your account</li>
-                <li><strong>Preferences:</strong> Remember your settings and preferences</li>
-                <li><strong>Analytics:</strong> Understand how our service is used</li>
-                <li><strong>Security:</strong> Detect and prevent fraud or abuse</li>
-              </ul>
+              <p>We retain different types of data for specific periods:</p>
               
-              <p>You can control cookies through your browser settings, though some features may not work properly if disabled.</p>
+              <div className="space-y-4">
+                <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+                  <h4 className="font-semibold text-white mb-2">Local Data (Chrome Extension)</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li><strong>Email summaries:</strong> Until you clear browser data or uninstall</li>
+                    <li><strong>OAuth tokens:</strong> Until you revoke access or uninstall</li>
+                    <li><strong>OTP codes:</strong> Maximum 2 minutes in memory only</li>
+                    <li><strong>Cache data:</strong> Automatically cleaned up periodically</li>
+                  </ul>
+                </div>
+                
+                <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+                  <h4 className="font-semibold text-white mb-2">Server Data</h4>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li><strong>Account information:</strong> Until you delete your account</li>
+                    <li><strong>Payment records:</strong> 7 years for legal compliance</li>
+                    <li><strong>Usage analytics:</strong> Anonymized after 1 year</li>
+                    <li><strong>Support tickets:</strong> 2 years for service improvement</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </section>
 
           {/* Section 10 */}
           <section id="changes" className="scroll-mt-8">
             <div className="flex items-center gap-3 mb-6">
-              <Shield className="w-6 h-6 text-cyan-400" />
-              <h2 className="text-2xl font-bold">10. Changes to This Policy</h2>
+              <Shield className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold">10. Changes to This Policy</h2>
             </div>
             
             <div className="space-y-4 text-gray-300 leading-relaxed">
               <p>
-                We may update this privacy policy from time to time. When we make significant changes, 
-                we will notify you by email and/or through our service. The "Last updated" date at the 
-                top of this policy indicates when it was last revised.
+                We may update this privacy policy to reflect changes in our practices or legal requirements. 
+                When we make material changes, we will:
               </p>
               
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>Update the "Last updated" date at the top of this policy</li>
+                <li>Notify users through the extension interface</li>
+                <li>Send email notifications for significant changes</li>
+                <li>Provide a summary of changes when possible</li>
+              </ul>
+              
               <p>
-                Your continued use of our service after changes become effective constitutes acceptance 
-                of the new privacy policy.
+                Continued use of the extension after changes become effective constitutes acceptance 
+                of the updated privacy policy.
               </p>
             </div>
           </section>
@@ -296,23 +462,25 @@ export default function PrivacyPolicyPage() {
           {/* Section 11 */}
           <section id="contact" className="scroll-mt-8">
             <div className="flex items-center gap-3 mb-6">
-              <Mail className="w-6 h-6 text-emerald-400" />
-              <h2 className="text-2xl font-bold">11. Contact Us</h2>
+              <Mail className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold">11. Contact Us</h2>
             </div>
             
             <div className="space-y-4 text-gray-300 leading-relaxed">
-              <p>If you have questions about this privacy policy or our data practices, please contact us:</p>
+              <p>For questions about this privacy policy or our data practices:</p>
               
               <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
                 <div className="space-y-2">
-                  <p><strong>Email:</strong> privacy@fusionmail.com</p>
-                  <p><strong>Support:</strong> sudhanshuk1140@gmail.com</p>
+                  <p><strong>Privacy Questions:</strong> privacy@fusionmail.com</p>
+                  <p><strong>General Support:</strong> sudhanshuk1140@gmail.com</p>
                   <p><strong>Website:</strong> https://fusionmail.com</p>
+                  <p><strong>Chrome Web Store:</strong> Search for "Fusion Mail" in Chrome Web Store</p>
                 </div>
               </div>
               
               <p className="text-sm text-gray-500">
-                We will respond to your inquiry within 30 days of receipt.
+                We respond to privacy inquiries within 30 days. For urgent security concerns, 
+                please mark your email as "URGENT - SECURITY".
               </p>
             </div>
           </section>
@@ -320,15 +488,16 @@ export default function PrivacyPolicyPage() {
 
         {/* Bottom CTA */}
         <div className="text-center mt-16 p-8 rounded-2xl bg-gray-900/50 border border-gray-700">
-          <h2 className="text-2xl font-bold mb-4">Questions About Privacy?</h2>
-          <p className="text-gray-400 text-lg mb-6 max-w-2xl mx-auto">
-            We're committed to transparency and protecting your privacy. 
-            Contact us if you have any questions or concerns.
+          <h2 className="text-3xl font-bold mb-4">Transparent Privacy Practices</h2>
+          <p className="text-gray-400 text-lg mb-6 max-w-3xl mx-auto">
+            We believe in transparency about how we handle your data. Our Chrome extension is designed 
+            with privacy in mind, processing most data locally and only using external services when necessary 
+            for core functionality.
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center flex-wrap">
             <Button size="lg" className="bg-white text-black hover:bg-gray-200">
               <Mail className="w-4 h-4 mr-2" />
-              Contact Support
+              Contact Privacy Team
             </Button>
             <Link href="/">
               <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-black">
