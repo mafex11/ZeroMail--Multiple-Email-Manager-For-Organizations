@@ -14,7 +14,8 @@ import logo from './assets/email-envelope-close--Streamline-Pixel.svg'
 import ChatPage from './components/ChatPage'
 import './styles.css'
 
-const clientId = '78669493829-j94lrbse4jre3slbe2ol613sbn288mqf.apps.googleusercontent.com'
+const clientId = '5870068255-c7vvtfeb7ol54qcto4fpr5nl45b4sp72.apps.googleusercontent.com'
+const clientSecret = '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'
 const SCOPES = [
   'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/userinfo.profile',
@@ -177,6 +178,71 @@ function App() {
     initializeApp()
   }, [])
 
+  // Helper function to refresh access tokens
+  const refreshAccessToken = async (account) => {
+    try {
+      console.log(`Refreshing token for ${account.email}...`)
+      const response = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: clientId,
+          client_secret: clientSecret,
+          refresh_token: account.refreshToken,
+          grant_type: 'refresh_token'
+        })
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Token refresh failed:', errorText)
+        throw new Error('Failed to refresh token')
+      }
+
+      const tokenData = await response.json()
+      console.log(`Token refreshed successfully for ${account.email}`)
+      
+      // Update account with new token and expiry
+      const updatedAccount = {
+        ...account,
+        accessToken: tokenData.access_token,
+        expiresAt: Date.now() + (tokenData.expires_in * 1000)
+      }
+
+      // Update in storage
+      const result = await chrome.storage.local.get('accounts')
+      const existingAccounts = result.accounts || []
+      const updatedAccounts = existingAccounts.map(acc => 
+        acc.email === account.email ? updatedAccount : acc
+      )
+      await chrome.storage.local.set({ accounts: updatedAccounts })
+      
+      // Update in state
+      setAccounts(updatedAccounts)
+      
+      return updatedAccount
+    } catch (error) {
+      console.error('Error refreshing token:', error)
+      throw error
+    }
+  }
+
+  // Helper function to ensure valid token before API calls
+  const ensureValidToken = async (account) => {
+    const now = Date.now()
+    const expiryBuffer = 5 * 60 * 1000 // Refresh 5 minutes before expiry
+    
+    if (!account.expiresAt || account.expiresAt - now < expiryBuffer) {
+      console.log(`Token expiring soon for ${account.email}, refreshing...`)
+      const refreshedAccount = await refreshAccessToken(account)
+      return refreshedAccount.accessToken
+    }
+    
+    return account.accessToken
+  }
+
   const refreshMessages = async () => {
     return performanceMonitor.measureAsync('refreshMessages', async () => {
       try {
@@ -211,9 +277,12 @@ function App() {
       // Process each account in parallel
       const accountPromises = accountsToLoad.map(async account => {
         try {
-          // First, verify the token still works
+          // Ensure we have a valid token before making API calls
+          const validAccessToken = await ensureValidToken(account)
+          
+          // Verify the token still works
           const testResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-            headers: { Authorization: `Bearer ${account.accessToken}` }
+            headers: { Authorization: `Bearer ${validAccessToken}` }
           })
 
           if (!testResponse.ok) {
@@ -243,7 +312,7 @@ function App() {
             `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=50&q=${encodeURIComponent(query)}`,
             {
               headers: {
-                Authorization: `Bearer ${account.accessToken}`,
+                Authorization: `Bearer ${validAccessToken}`,
               },
             }
           )
@@ -260,11 +329,11 @@ function App() {
 
           // Fetch all message details in parallel
           const detailsPromises = data.messages.map(message =>
-            fetch(
+                          fetch(
               `https://gmail.googleapis.com/gmail/v1/users/me/messages/${message.id}`,
               {
                 headers: {
-                  Authorization: `Bearer ${account.accessToken}`,
+                  Authorization: `Bearer ${validAccessToken}`,
                 },
               }
             ).then(async (messageResponse) => {
@@ -365,7 +434,8 @@ function App() {
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${clientId}&` +
         `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-        `response_type=token&` +
+        `response_type=code&` +
+        `access_type=offline&` +
         `prompt=consent&` +
         `scope=${encodeURIComponent(SCOPES)}`
       
@@ -391,20 +461,51 @@ function App() {
       }
 
       console.log('Processing OAuth response...')
-      let accessToken
+      let authorizationCode
       try {
         const url = new URL(responseUrl)
-        const hashParams = new URLSearchParams(url.hash.substring(1))
-        accessToken = hashParams.get('access_token')
+        const urlParams = new URLSearchParams(url.search)
+        authorizationCode = urlParams.get('code')
         
-        if (!accessToken) {
-          console.error('No access token in response URL')
-          throw new Error('No access token received')
+        if (!authorizationCode) {
+          console.error('No authorization code in response URL')
+          throw new Error('No authorization code received')
         }
-        console.log('Access token extracted successfully')
+        console.log('Authorization code extracted successfully')
       } catch (urlError) {
         console.error('Failed to parse response URL:', urlError)
         throw new Error('Failed to process authentication response')
+      }
+
+      // Exchange authorization code for tokens
+      console.log('Exchanging authorization code for tokens...')
+      let tokenData
+      try {
+        const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            code: authorizationCode,
+            grant_type: 'authorization_code',
+            redirect_uri: redirectUri
+          })
+        })
+
+        if (!tokenResponse.ok) {
+          const errorText = await tokenResponse.text()
+          console.error('Token exchange failed:', errorText)
+          throw new Error('Failed to exchange authorization code for tokens')
+        }
+
+        tokenData = await tokenResponse.json()
+        console.log('Token exchange successful')
+      } catch (tokenError) {
+        console.error('Failed to exchange tokens:', tokenError)
+        throw new Error('Failed to get access tokens')
       }
 
       // Verify the token works by fetching user info
@@ -413,7 +514,7 @@ function App() {
       try {
         const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
           headers: {
-            'Authorization': `Bearer ${accessToken}`,
+            'Authorization': `Bearer ${tokenData.access_token}`,
             'Accept': 'application/json'
           }
         })
@@ -455,7 +556,9 @@ function App() {
       console.log('Adding new account to storage...')
       const newAccount = {
         email: userInfo.email,
-        accessToken: accessToken,
+        accessToken: tokenData.access_token,
+        refreshToken: tokenData.refresh_token,
+        expiresAt: Date.now() + (tokenData.expires_in * 1000),
         profilePicture: userInfo.picture // Google OAuth returns the picture URL in userInfo
       }
 
@@ -529,13 +632,16 @@ function App() {
       const account = accounts.find(acc => acc.email === message.accountEmail)
       if (!account) return
 
+      // Ensure we have a valid token
+      const validAccessToken = await ensureValidToken(account)
+
       // Call Gmail API to archive the message
       const response = await fetch(
         `https://gmail.googleapis.com/gmail/v1/users/me/messages/${message.id}/modify`,
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${account.accessToken}`,
+            'Authorization': `Bearer ${validAccessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -609,6 +715,9 @@ function App() {
       const account = accounts.find(acc => acc.email === message.accountEmail)
       if (!account) return
 
+      // Ensure we have a valid token
+      const validAccessToken = await ensureValidToken(account)
+
       const newIsUnread = !message.isUnread
       
       // Call Gmail API to toggle read status
@@ -617,7 +726,7 @@ function App() {
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${account.accessToken}`,
+            'Authorization': `Bearer ${validAccessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -663,6 +772,9 @@ function App() {
       const account = accounts.find(acc => acc.email === message.accountEmail)
       if (!account) return
 
+      // Ensure we have a valid token
+      const validAccessToken = await ensureValidToken(account)
+
       const newIsStarred = !message.isStarred
       
       // Call Gmail API to toggle star status
@@ -671,7 +783,7 @@ function App() {
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${account.accessToken}`,
+            'Authorization': `Bearer ${validAccessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -792,12 +904,15 @@ function App() {
       
       for (const account of accountsToSearch) {
         try {
+          // Ensure we have a valid token
+          const validAccessToken = await ensureValidToken(account)
+          
           // Use Gmail API to search with the query
           const response = await fetch(
             `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=100&q=${encodeURIComponent(query)}`,
             {
               headers: {
-                Authorization: `Bearer ${account.accessToken}`,
+                Authorization: `Bearer ${validAccessToken}`,
               },
             }
           )
@@ -813,7 +928,7 @@ function App() {
               `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}`,
               {
                 headers: {
-                  Authorization: `Bearer ${account.accessToken}`,
+                  Authorization: `Bearer ${validAccessToken}`,
                 },
               }
             )
