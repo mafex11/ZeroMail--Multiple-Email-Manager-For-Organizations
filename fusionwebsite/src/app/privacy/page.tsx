@@ -251,14 +251,14 @@ export default function PrivacyPolicyPage() {
         {/* Title */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Shield className="w-8 h-8 text-white" />
+            {/* <Shield className="w-8 h-8 text-white" /> */}
             <h1 className="text-5xl font-bold doto-title">Privacy Policy</h1>
           </div>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
             Simple, transparent privacy practices for Fusion Mail Chrome Extension
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            {/* Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} */}
           </p>
         </div>
 
