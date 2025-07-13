@@ -17,20 +17,7 @@
     </style>
     <link rel="preload" href="/src/assets/bg.png" as="image" type="image/png" />
     <link rel="stylesheet" href="/src/styles.css" />
-    <script>
-      // Register service worker for asset caching
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-              console.log('ServiceWorker registration successful');
-            })
-            .catch(err => {
-              console.log('ServiceWorker registration failed: ', err);
-            });
-        });
-      }
-    </script>
+    <script src="sw-register.js"></script>
   </head>
   <body>
     <div id="root"></div>

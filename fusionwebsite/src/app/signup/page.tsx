@@ -92,10 +92,10 @@ function SignupForm({
   }
 
   return (
-    <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
+    <form className={cn("flex flex-col gap-6 bg-white rounded-lg p-6", className)} onSubmit={handleSubmit} {...props}>
       {/* Header */}
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-3xl font-bold text-white doto-navbar">Create Account</h1>
+        <h1 className="text-3xl font-bold text-black doto-navbar">Create Account</h1>
        
       </div>
 
@@ -107,36 +107,36 @@ function SignupForm({
       )}
 
       {/* Form Fields */}
-      <div className="grid gap-6">
+      <div className="grid gap-4">
         {/* Name Fields */}
         <div className="grid grid-cols-2 gap-3">
           <div className="grid gap-2">
-            <Label htmlFor="firstName" className="text-white text-sm font-medium">
+            <Label htmlFor="firstName" className="text-black text-sm font-medium">
               First Name
             </Label>
             <Input 
               id="firstName" 
               name="firstName"
               type="text" 
-              placeholder="John"
+              placeholder="Enter your first name"
               value={formData.firstName}
               onChange={handleChange}
-              className="bg-gray-900 border-gray-700 text-white placeholder:text-gray-500 focus:border-white focus:ring-white/20"
+              className="bg-gray-900 text-black placeholder:text-gray-500 focus:border-white focus:ring-white/20"
               required 
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="lastName" className="text-white text-sm font-medium">
+            <Label htmlFor="lastName" className="text-black text-sm font-medium">
               Last Name
             </Label>
             <Input 
               id="lastName" 
               name="lastName"
               type="text" 
-              placeholder="Doe"
+              placeholder="Enter your last name"
               value={formData.lastName}
               onChange={handleChange}
-              className="bg-gray-900 border-gray-700 text-white placeholder:text-gray-500 focus:border-white focus:ring-white/20"
+              className="bg-gray-900  text-black placeholder:text-gray-500 focus:border-white focus:ring-white/20"
               required 
             />
           </div>
@@ -144,24 +144,24 @@ function SignupForm({
 
         {/* Email Field */}
         <div className="grid gap-3">
-          <Label htmlFor="email" className="text-white text-sm font-medium">
+          <Label htmlFor="email" className="text-black text-sm font-medium">
             Email Address
           </Label>
           <Input 
             id="email" 
             name="email"
             type="email" 
-            placeholder="john@example.com"
+            placeholder="Enter your email"
             value={formData.email}
             onChange={handleChange}
-            className="bg-gray-900 border-gray-700 text-white placeholder:text-gray-500 focus:border-white focus:ring-white/20"
+            className="bg-gray-900  text-black placeholder:text-gray-500 focus:border-white focus:ring-white/20"
             required 
           />
         </div>
 
         {/* Password Field */}
         <div className="grid gap-3">
-          <Label htmlFor="password" className="text-white text-sm font-medium">
+          <Label htmlFor="password" className="text-black text-sm font-medium">
             Password
           </Label>
           <Input 
@@ -171,14 +171,14 @@ function SignupForm({
             placeholder="Create a password"
             value={formData.password}
             onChange={handleChange}
-            className="bg-gray-900 border-gray-700 text-white placeholder:text-gray-500 focus:border-white focus:ring-white/20"
+            className="bg-gray-900  text-black placeholder:text-gray-500 focus:border-white focus:ring-white/20"
             required 
           />
         </div>
 
         {/* Confirm Password Field */}
         <div className="grid gap-3">
-          <Label htmlFor="confirmPassword" className="text-white text-sm font-medium">
+          <Label htmlFor="confirmPassword" className="text-black text-sm font-medium">
             Confirm Password
           </Label>
           <Input 
@@ -188,7 +188,7 @@ function SignupForm({
             placeholder="Confirm your password"
             value={formData.confirmPassword}
             onChange={handleChange}
-            className="bg-gray-900 border-gray-700 text-white placeholder:text-gray-500 focus:border-white focus:ring-white/20"
+            className="bg-gray-900 text-black placeholder:text-gray-500 focus:border-white focus:ring-white/20"
             required 
           />
         </div>
@@ -197,7 +197,7 @@ function SignupForm({
         <Button 
           type="submit" 
           disabled={isLoading}
-          className="w-full bg-white text-black hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold py-3 transition-colors"
+          className="w-full  text-white disabled:opacity-50 disabled:cursor-not-allowed font-semibold py-3 transition-colors bg-black hover:bg-zinc-800"
         >
           {isLoading ? 'Creating Account...' : 'Create Account'}
         </Button>
@@ -208,7 +208,7 @@ function SignupForm({
         <span className="text-gray-400">Already have an account? </span>
         <a 
           href="/login" 
-          className="text-white hover:text-gray-300 underline underline-offset-4 transition-colors font-medium"
+          className="text-black hover:text-zinc-500 underline underline-offset-4 transition-colors font-medium"
         >
           Sign In
         </a>

@@ -252,7 +252,7 @@ export default function Home() {
               Join thousands of users who have revolutionized their email workflow with Fusion Mail.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-             
+
               <Link href="/login">
                 <InteractiveHoverButton className="h-12 px-6 text-lg">
                   Get Started Now
