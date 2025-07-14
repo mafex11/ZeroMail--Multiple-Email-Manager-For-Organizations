@@ -221,9 +221,10 @@ export default function SignUpPage() {
   return (
     <div className="bg-zinc-900 text-white flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
-        <a href="/" className="flex items-center gap-2 self-center font-medium">
-          <div className="bg-white text-black flex size-6 items-center justify-center rounded-md">
-            <GalleryVerticalEnd className="size-4" />
+      <a href="#" className="flex items-center gap-2 self-center font-medium text-white">
+          <div className="bg-black text-primary-foreground flex size-8 items-center justify-center rounded-md ">
+            {/* <GalleryVerticalEnd className="size-4 text-black" /> */}
+            <img src="/email-envelope-close--Streamline-Pixel.svg" alt="Fusion Mail" className="size-6" />
           </div>
           Fusion Mail
         </a>

@@ -74,6 +74,7 @@ export default function Navigation() {
   return (
     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] w-full flex justify-center">
       <NavigationMenu className="dark bg-zinc-800/30 backdrop-blur-md px-4 py-2 rounded-md text-white relative z-50 w-auto border border-zinc-700/50 shadow-lg " viewport={false} orientation="horizontal">
+    
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuTrigger>Home</NavigationMenuTrigger>

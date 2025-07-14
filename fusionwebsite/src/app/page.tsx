@@ -138,20 +138,23 @@ export default function Home() {
     <div className="bg-zinc-950 items-center justify-items-center min-h-screen p-8 pb-20 font-[family-name:var(--font-geist-sans)] ">
 
       <main className="flex flex-col items-center relative mx-auto">
-                 <div className="relative flex flex-col items-center ">
+        <div className="relative flex flex-col items-center">
             <span className="mt-40 md:mt-48 lg:mt-60 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-6xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl px-4 w-screen"> 
-              Fusion Mail
+            Fusion Mail
             </span>
+
           <h1 className="mt-4 bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10 text-xl md:text-4xl w-full max-w-4xl mx-auto px-6">
             Your One Stop Solution for all your mail needs.
           </h1>
           <div className='flex flex-row gap-10'>
           {/* <InteractiveHoverButton className="mt-10">Download</InteractiveHoverButton> */}
           <Button className="mt-10 h-10 rounded-4xl text-md w-34 " variant={"destructive"}>
-            <GrDownload  className="h-4 w-4" />
-            Download
+            {/* <GrDownload  className="h-4 w-4" /> */}
+            Coming soon
           </Button>
-          <InteractiveHoverButton className="mt-10">Try Now</InteractiveHoverButton>
+          <Link href="/#contact-form">
+            <InteractiveHoverButton className="mt-10">Try Now</InteractiveHoverButton>
+          </Link>
           </div>
           
                      {/* Hero Images with Silk background */}
