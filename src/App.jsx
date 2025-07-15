@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Cog6ToothIcon, PlusIcon, EnvelopeIcon, ArrowPathIcon, SunIcon, MoonIcon, InboxIcon, PaperAirplaneIcon, MagnifyingGlassIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline'
 import { ShimmerButton } from './components/magicui/shimmer-button'
-import { subscriptionService } from './utils/subscriptionService'
 import MessageList from './components/MessageList'
 import SettingsPage from './components/SettingsPage'
 import AvatarPage from './components/AvatarPage'
@@ -322,8 +321,15 @@ function App() {
           }
 
           const data = await messagesResponse.json()
-          if (!data.messages || !Array.isArray(data.messages)) {
-            console.error(`Invalid message data for ${account.email}:`, data)
+          
+          // Check if no messages were found (this is normal, not an error)
+          if (!data.messages) {
+            console.log(`No messages found for ${account.email} in ${type}`)
+            return []
+          }
+          
+          if (!Array.isArray(data.messages)) {
+            console.error(`Invalid message data for ${account.email}:`, JSON.stringify(data, null, 2))
             return []
           }
 

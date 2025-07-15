@@ -10,10 +10,8 @@ import {
 } from '@heroicons/react/24/outline'
 import ReactMarkdown from 'react-markdown'
 import { emailChatService } from '../utils/emailChatService'
-import { subscriptionService } from '../utils/subscriptionService'
 import EmailList from './EmailList'
 import ActionButtons from './ActionButtons'
-import PaywallModal from './PaywallModal'
 
 // Simple Markdown Renderer Component
 const MarkdownRenderer = ({ content, isDarkMode }) => {
@@ -118,10 +116,6 @@ function ChatPage({
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(new Set())
   const [processingAction, setProcessingAction] = useState(false)
-  const [showPaywall, setShowPaywall] = useState(false)
-  const [hasSubscription, setHasSubscription] = useState(false)
-  const [usageCount, setUsageCount] = useState(0)
-  const [dailyLimit, setDailyLimit] = useState(5)
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -168,51 +162,14 @@ function ChatPage({
     inputRef.current?.focus()
   }, [])
 
-  // Check subscription status and usage limits
-  useEffect(() => {
-    const checkSubscriptionStatus = async () => {
-      try {
-        const subscription = await subscriptionService.hasActiveSubscription()
-        setHasSubscription(subscription)
-        
-        if (!subscription) {
-          // Get usage limits for free tier
-          const limits = await subscriptionService.getUsageLimits()
-          setDailyLimit(limits.aiQueries)
-          
-          // Get current usage
-          const today = new Date().toDateString()
-          const storageKey = `usage_${today}`
-          const result = await chrome.storage.local.get([storageKey])
-          const usage = result[storageKey] || {}
-          setUsageCount(usage.aiQueries || 0)
-        }
-      } catch (error) {
-        console.error('Error checking subscription status:', error)
-      }
-    }
 
-    checkSubscriptionStatus()
-  }, [])
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return
 
-    // Check if user has exceeded free tier limits
-    if (!hasSubscription && usageCount >= dailyLimit) {
-      setShowPaywall(true)
-      return
-    }
-
     const userMessage = inputMessage.trim()
     setInputMessage('')
     setIsLoading(true)
-
-    // Track usage for free tier users
-    if (!hasSubscription) {
-      const newUsageCount = await subscriptionService.trackUsage('aiQueries')
-      setUsageCount(newUsageCount)
-    }
 
     // Add user message to chat
     const newUserMessage = {
@@ -515,15 +472,6 @@ function ChatPage({
               <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 {currentAccount} • {currentFilter} • {messages?.length || 0} emails
               </p>
-              {!hasSubscription && (
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  usageCount >= dailyLimit 
-                    ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                    : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                }`}>
-                  {usageCount}/{dailyLimit} free
-                </span>
-              )}
               </div>
             </div>
           </div>
@@ -723,13 +671,7 @@ function ChatPage({
         </div>
       </div>
 
-      {/* Paywall Modal */}
-      <PaywallModal
-        isOpen={showPaywall}
-        onClose={() => setShowPaywall(false)}
-        featureName="email_chat"
-        isDarkMode={isDarkMode}
-      />
+
     </div>
   )
 }

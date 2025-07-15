@@ -13,7 +13,6 @@ import {
 } from '@heroicons/react/24/outline'
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid'
 import { emailSummaryService } from '../utils/emailSummaryService'
-import { subscriptionService } from '../utils/subscriptionService'
 
 // Enhanced component for scrolling text with fade-in animation
 const ScrollingText = ({ text, className }) => {
@@ -72,7 +71,6 @@ function MessageList({
   const [readFilter, setReadFilter] = useState('all')
   const [emailSummaries, setEmailSummaries] = useState(new Map())
   const [loadingSummaries, setLoadingSummaries] = useState(new Set())
-  const [hasSubscription, setHasSubscription] = useState(false)
 
   const getAccountProfilePicture = (accountEmail) => {
     const account = accounts.find(acc => acc.email === accountEmail)
@@ -195,19 +193,13 @@ function MessageList({
     const initializeAndLoadSummaries = async () => {
       await emailSummaryService.initialize()
       
-      // Check subscription status to determine summary eligibility
-      const subscriptionStatus = await subscriptionService.hasActiveSubscription()
-      setHasSubscription(subscriptionStatus)
-      
       // Load cached summaries for current messages
       const cachedSummaries = new Map()
       const needsProcessing = new Set()
       
       sortedMessages.forEach((message, index) => {
-        // For free tier, only show summaries for top 3 emails
-        const shouldShowSummary = subscriptionStatus || index < 3
-        
-        if (shouldShowSummary) {
+        // Show summaries for all emails
+        if (true) {
           const summary = emailSummaryService.getSummaryFromCache(message)
           if (summary !== null) {
             cachedSummaries.set(message.id, summary)
@@ -220,7 +212,7 @@ function MessageList({
       
       setEmailSummaries(cachedSummaries)
       setLoadingSummaries(needsProcessing)
-              console.log(`Loaded ${cachedSummaries.size} cached summaries, ${needsProcessing.size} emails need processing (${subscriptionStatus ? 'paid' : 'free'} tier)`)
+              console.log(`Loaded ${cachedSummaries.size} cached summaries, ${needsProcessing.size} emails need processing`)
     }
 
     if (sortedMessages.length > 0) {
@@ -234,35 +226,19 @@ function MessageList({
       if (sortedMessages.length === 0 || loadingSummaries.size === 0) return
       
       try {
-        // For free tier: only process top 3 emails for summaries
-        // For paid tier: process top 5 emails to conserve credits
-        const maxEmailsToProcess = hasSubscription ? 5 : 3
-        
+        // Process all emails that need summaries
         const emailsToProcess = sortedMessages
           .filter(msg => loadingSummaries.has(msg.id))
-          .slice(0, maxEmailsToProcess)
         
         if (emailsToProcess.length === 0) return
         
-        console.log(`Processing ${emailsToProcess.length} emails (${hasSubscription ? 'paid' : 'free'} tier)`)
+        console.log(`Processing ${emailsToProcess.length} emails`)
         
         // Process emails one by one
         for (let i = 0; i < emailsToProcess.length; i++) {
           const message = emailsToProcess[i]
           
           try {
-            // For free tier, only generate summaries for top 3 emails
-            if (!hasSubscription && i >= 3) {
-              console.log(`Skipping summary for email ${i + 1} (free tier limit: top 3 only)`)
-              
-              // Remove from loading set without generating summary
-              setLoadingSummaries(prev => {
-                const newSet = new Set(prev)
-                newSet.delete(message.id)
-                return newSet
-              })
-              continue
-            }
             
             const summary = await emailSummaryService.generateSummaryInBackground(message)
             
@@ -413,14 +389,7 @@ function MessageList({
                       }`}>
                         {senderName}
                       </div>
-                      {/* Free tier indicator for top 3 emails */}
-                      {!hasSubscription && index < 3 && (
-                        <div className={`px-1.5 py-0.5 text-xs rounded-full ${
-                          isDarkMode ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100 text-blue-600'
-                        }`}>
-                          AI
-                        </div>
-                      )}
+
                       <div className={`flex-shrink-0 text-xs ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
                       }`}>
@@ -472,25 +441,6 @@ function MessageList({
                       }`}>
                         <ArrowPathIcon className="w-3.5 h-3.5 flex-shrink-0 animate-spin" />
                         <span>Generating summary...</span>
-                      </div>
-                    ) : !hasSubscription && index >= 3 ? (
-                      <div className="space-y-1">
-                        {/* Email content snippet for free tier users */}
-                        <div className={`text-xs ${
-                          isDarkMode ? 'text-blue-300' : 'text-blue-600'
-                        }`}>
-                          {message.snippet && message.snippet.length > 0 
-                            ? message.snippet.substring(0, 120) + (message.snippet.length > 120 ? '...' : '')
-                            : 'No preview available'
-                          }
-                        </div>
-                        {/* Upgrade prompt */}
-                        <div className={`flex items-center gap-1.5 text-xs italic ${
-                          isDarkMode ? 'text-gray-500' : 'text-gray-400'
-                        }`}>
-                          <SparklesIcon className="w-3.5 h-3.5 flex-shrink-0 opacity-50" />
-                          <span>Upgrade for AI summaries</span>
-                        </div>
                       </div>
                     ) : message.snippet && message.snippet.length > 0 ? (
                       <div className={`text-xs ${
