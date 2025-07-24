@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     react(),
     {
-      name: 'copy-content-script',
+      name: 'copy-extension-files',
       writeBundle() {
         // Copy content script to dist folder
         try {
@@ -16,6 +16,14 @@ export default defineConfig({
           console.log('Content script copied to dist/')
         } catch (error) {
           console.warn('Could not copy content script:', error.message)
+        }
+
+        // Copy service worker registration script to dist folder
+        try {
+          copyFileSync('src/service-worker-registration.js', 'dist/service-worker-registration.js')
+          console.log('Service worker registration script copied to dist/')
+        } catch (error) {
+          console.warn('Could not copy service worker registration script:', error.message)
         }
       }
     }
